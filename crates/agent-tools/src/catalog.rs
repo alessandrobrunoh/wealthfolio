@@ -36,16 +36,19 @@ impl AgentToolCatalog {
     }
 
     /// The MCP catalog: read + draft/suggest + commit, import, transfer
-    /// linking, quote import and activity update tools. Scope filtering at the
-    /// boundary (`execute`, `list_tools`) hides whatever a token can't reach.
+    /// linking, quote import, activity updates, and user-managed entity writes.
+    /// Scope filtering at the boundary (`execute`, `list_tools`) hides whatever
+    /// a token can't reach.
     pub fn mcp_catalog() -> Self {
         let mut tools = crate::tools::v1_read_tools();
+        tools.extend(crate::tools::mcp_entity_read_tools());
         tools.extend(crate::tools::draft_suggest_tools());
         tools.extend(crate::tools::commit_tools());
         tools.extend(crate::tools::import_tools());
         tools.extend(crate::tools::transfer_link_tools());
         tools.extend(crate::tools::quote_import_tools());
         tools.extend(crate::tools::activity_update_tools());
+        tools.extend(crate::tools::entity_write_tools());
         Self::new(tools)
     }
 
@@ -273,6 +276,9 @@ mod tests {
         assert!(!names.contains(&"commit_quote_import"));
         assert!(!names.contains(&"prepare_activity_updates"));
         assert!(!names.contains(&"commit_activity_updates"));
+        assert!(!names.contains(&"get_goal_details"));
+        assert!(!names.contains(&"get_asset_profile"));
+        assert!(!names.contains(&"create_account"));
     }
 
     #[test]
@@ -294,8 +300,32 @@ mod tests {
         assert!(names.contains(&"commit_quote_import"));
         assert!(names.contains(&"prepare_activity_updates"));
         assert!(names.contains(&"commit_activity_updates"));
+        assert!(names.contains(&"get_goal_details"));
+        assert!(names.contains(&"get_asset_profile"));
+        for name in [
+            "create_account",
+            "update_account",
+            "create_portfolio",
+            "update_portfolio",
+            "create_goal",
+            "update_goal",
+            "replace_goal_funding",
+            "save_goal_plan",
+            "create_contribution_limit",
+            "update_contribution_limit",
+            "create_manual_asset",
+            "update_asset_profile",
+            "create_taxonomy",
+            "update_taxonomy",
+            "create_category",
+            "update_category",
+            "move_category",
+        ] {
+            assert!(names.contains(&name), "{name} is in the MCP catalog");
+        }
         // Read-only token still sees exactly 16 read tools.
         assert_eq!(crate::tools::v1_read_tools().len(), 16);
+        assert_eq!(crate::tools::mcp_entity_read_tools().len(), 2);
     }
 
     #[tokio::test]
@@ -315,6 +345,25 @@ mod tests {
             "commit_quote_import",
             "prepare_activity_updates",
             "commit_activity_updates",
+            "create_account",
+            "update_account",
+            "create_portfolio",
+            "update_portfolio",
+            "create_goal",
+            "update_goal",
+            "replace_goal_funding",
+            "save_goal_plan",
+            "create_contribution_limit",
+            "update_contribution_limit",
+            "create_manual_asset",
+            "update_asset_profile",
+            "create_taxonomy",
+            "update_taxonomy",
+            "create_category",
+            "update_category",
+            "move_category",
+            "get_goal_details",
+            "get_asset_profile",
         ] {
             let err = catalog
                 .execute(

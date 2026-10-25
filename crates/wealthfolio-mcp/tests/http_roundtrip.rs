@@ -167,6 +167,42 @@ impl AgentTool for HiddenTool {
     }
 }
 
+struct SensitiveFailureTool;
+
+#[async_trait::async_trait]
+impl AgentTool for SensitiveFailureTool {
+    fn name(&self) -> &'static str {
+        "sensitive_failure"
+    }
+    fn description(&self) -> &'static str {
+        "Test a data-bearing write failure."
+    }
+    fn input_schema(&self) -> serde_json::Value {
+        serde_json::json!({ "type": "object", "properties": {} })
+    }
+    fn required_scopes(&self) -> &'static [AgentScope] {
+        &[AgentScope::AccountsRead]
+    }
+    fn access_level(&self) -> AgentToolAccess {
+        AgentToolAccess::Write
+    }
+    fn sanitize_args_for_audit(&self, _: &serde_json::Value) -> serde_json::Value {
+        serde_json::json!({ "payload": "[redacted]" })
+    }
+    fn sanitize_error_for_audit(&self, _: &AgentToolError) -> String {
+        "Write failed; details redacted".to_string()
+    }
+    async fn call(
+        &self,
+        _env: Arc<dyn AgentEnvironment>,
+        _args: serde_json::Value,
+    ) -> Result<AgentToolResult, AgentToolError> {
+        Err(AgentToolError::ExecutionFailed(
+            "Account private-account-123 cannot be updated".to_string(),
+        ))
+    }
+}
+
 #[derive(Default)]
 struct CapturingSink {
     entries: Mutex<Vec<McpAuditEntry>>,
@@ -190,7 +226,11 @@ async fn inject_auth(mut req: Request<Body>, next: Next) -> Response {
 
 async fn spawn_server(with_auth: bool, sink: Arc<CapturingSink>) -> String {
     let service = McpServerBuilder::new(Arc::new(StubEnv))
-        .tools(vec![Arc::new(EchoTool), Arc::new(HiddenTool)])
+        .tools(vec![
+            Arc::new(EchoTool),
+            Arc::new(HiddenTool),
+            Arc::new(SensitiveFailureTool),
+        ])
         .audit(sink)
         .build_http_service(
             StreamableHttpServerConfig::default()
@@ -246,7 +286,7 @@ async fn full_roundtrip_with_scope_filtering_and_audit() {
     let init = rpc(&client, &url, init_body()).await;
     assert_eq!(init["result"]["serverInfo"]["name"], "wealthfolio");
 
-    // tools/list — only the AccountsRead tool is visible
+    // tools/list — only tools available with AccountsRead are visible
     let list = rpc(
         &client,
         &url,
@@ -254,10 +294,15 @@ async fn full_roundtrip_with_scope_filtering_and_audit() {
     )
     .await;
     let tools = list["result"]["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 1, "scope filtering failed: {tools:?}");
-    assert_eq!(tools[0]["name"], "echo");
-    assert_eq!(tools[0]["title"], "Echo");
-    assert_eq!(tools[0]["annotations"]["readOnlyHint"], true);
+    assert_eq!(tools.len(), 2, "scope filtering failed: {tools:?}");
+    let echo = tools.iter().find(|tool| tool["name"] == "echo").unwrap();
+    assert_eq!(echo["title"], "Echo");
+    assert_eq!(echo["annotations"]["readOnlyHint"], true);
+    let sensitive_failure = tools
+        .iter()
+        .find(|tool| tool["name"] == "sensitive_failure")
+        .unwrap();
+    assert_eq!(sensitive_failure["annotations"]["readOnlyHint"], false);
 
     // tools/call success with structured content
     let call = rpc(
@@ -287,13 +332,28 @@ async fn full_roundtrip_with_scope_filtering_and_audit() {
     .await;
     assert_eq!(denied["result"]["isError"], true);
 
+    // The MCP caller still receives the useful service error, but the audit
+    // entry stores only the tool's sanitized message and arguments.
+    let failed = rpc(
+        &client,
+        &url,
+        serde_json::json!({
+            "jsonrpc": "2.0", "id": 5, "method": "tools/call",
+            "params": { "name": "sensitive_failure", "arguments": { "accountId": "private-account-123" } }
+        }),
+    )
+    .await;
+    assert_eq!(failed["result"]["isError"], true);
+    let caller_error = failed["result"]["content"][0]["text"].as_str().unwrap();
+    assert!(caller_error.contains("private-account-123"));
+
     // tools/call with an unknown name is rejected — and still audited, so
     // name-probing leaves a trace.
     let unknown = rpc(
         &client,
         &url,
         serde_json::json!({
-            "jsonrpc": "2.0", "id": 5, "method": "tools/call",
+            "jsonrpc": "2.0", "id": 6, "method": "tools/call",
             "params": { "name": "no_such_tool", "arguments": {} }
         }),
     )
@@ -306,19 +366,37 @@ async fn full_roundtrip_with_scope_filtering_and_audit() {
         "expected unknown-tool error, got: {unknown}"
     );
 
-    // audit entries: success for echo, denied for hidden, error for the
-    // unknown tool. The handler awaits the audit write before responding, so
+    // audit entries: success for echo, denied for hidden, sanitized error for
+    // the failed write, and error for the unknown tool. The handler awaits the audit write before responding, so
     // the rows are present by now; the short poll just tolerates sink latency.
     let mut tries = 0;
     loop {
         let entries = sink.entries.lock().await;
-        if entries.len() >= 3 {
+        if entries.len() >= 4 {
             assert!(entries
                 .iter()
                 .any(|e| e.tool == "echo" && e.outcome == AuditOutcome::Success));
             assert!(entries
                 .iter()
                 .any(|e| e.tool == "hidden" && e.outcome == AuditOutcome::Denied));
+            let failed_entry = entries
+                .iter()
+                .find(|e| e.tool == "sensitive_failure")
+                .expect("failed write must be audited");
+            assert_eq!(failed_entry.outcome, AuditOutcome::Error);
+            assert_eq!(
+                failed_entry.error_message.as_deref(),
+                Some("Write failed; details redacted")
+            );
+            assert_eq!(
+                failed_entry.args_summary,
+                serde_json::json!({ "payload": "[redacted]" })
+            );
+            assert!(!failed_entry
+                .error_message
+                .as_deref()
+                .unwrap_or_default()
+                .contains("private-account-123"));
             let unknown_entry = entries
                 .iter()
                 .find(|e| e.tool == "no_such_tool")

@@ -1472,7 +1472,7 @@
     "dialog_copy_token_aria": "Copia token",
     "dialog_client_config": "Configurazione del client",
     "dialog_done": "Fatto",
-    "scope_locked_title": "Richiesto da Movimenti — conferma/scrittura",
+    "scope_locked_title": "Richiesto da un permesso di scrittura selezionato",
     "scope_locked_market_data_title": "Richiesto da Dati di mercato — scrittura",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "Token",
@@ -1504,6 +1504,26 @@
       "classification_read": {
         "label": "Classificazione (lettura)",
         "description": "Leggi le classificazioni e le tassonomie degli strumenti."
+      },
+      "accounts_write": {
+        "label": "Conti — crea/modifica",
+        "description": "Crea conti manuali e modifica le relative impostazioni. Richiede accounts:read."
+      },
+      "holdings_write": {
+        "label": "Asset — crea/modifica",
+        "description": "Crea asset alternativi manuali e aggiorna profili e modalità di valutazione. Richiede holdings:read."
+      },
+      "portfolios_write": {
+        "label": "Portafogli — crea/modifica",
+        "description": "Crea o aggiorna portafogli salvati per i report. Richiede accounts:read."
+      },
+      "financial_planning_write": {
+        "label": "Pianificazione finanziaria — scrittura",
+        "description": "Crea o aggiorna obiettivi, piani di finanziamento e limiti di contribuzione. Richiede financial-planning:read."
+      },
+      "taxonomies_write": {
+        "label": "Tassonomie — scrittura",
+        "description": "Crea o aggiorna tassonomie e categorie di asset dell'utente. Richiede classification:read."
       },
       "activities_draft": {
         "label": "Movimenti — bozza",

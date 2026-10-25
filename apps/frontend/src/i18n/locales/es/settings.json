@@ -1472,7 +1472,7 @@
     "dialog_copy_token_aria": "Copiar token",
     "dialog_client_config": "Configuración del cliente",
     "dialog_done": "Listo",
-    "scope_locked_title": "Requerido por Actividades: confirmar/escribir",
+    "scope_locked_title": "Requerido por un permiso de escritura seleccionado",
     "scope_locked_market_data_title": "Requerido por Datos de mercado: escribir",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "Token",
@@ -1504,6 +1504,26 @@
       "classification_read": {
         "label": "Clasificación (lectura)",
         "description": "Leer las clasificaciones y taxonomías de instrumentos."
+      },
+      "accounts_write": {
+        "label": "Cuentas: crear/editar",
+        "description": "Crear cuentas manuales y editar sus ajustes. Requiere accounts:read."
+      },
+      "holdings_write": {
+        "label": "Activos: crear/editar",
+        "description": "Crear activos alternativos manuales y actualizar perfiles y modo de valoración. Requiere holdings:read."
+      },
+      "portfolios_write": {
+        "label": "Carteras: crear/editar",
+        "description": "Crear o actualizar carteras guardadas para informes. Requiere accounts:read."
+      },
+      "financial_planning_write": {
+        "label": "Planificación financiera: escritura",
+        "description": "Crear o actualizar objetivos, planes de financiación y límites de aportación. Requiere financial-planning:read."
+      },
+      "taxonomies_write": {
+        "label": "Taxonomías: escritura",
+        "description": "Crear o actualizar taxonomías y categorías de activos propias. Requiere classification:read."
       },
       "activities_draft": {
         "label": "Actividades: borrador",

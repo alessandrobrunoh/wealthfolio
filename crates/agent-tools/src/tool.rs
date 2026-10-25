@@ -85,6 +85,13 @@ pub trait AgentTool: Send + Sync {
         args.clone()
     }
 
+    /// Sanitize errors before they are copied into the MCP audit log.
+    /// Tools whose failures can contain user-supplied details should override
+    /// this while still returning the full error to the MCP caller.
+    fn sanitize_error_for_audit(&self, error: &AgentToolError) -> String {
+        error.to_string()
+    }
+
     /// Execute the tool against the environment.
     async fn call(
         &self,

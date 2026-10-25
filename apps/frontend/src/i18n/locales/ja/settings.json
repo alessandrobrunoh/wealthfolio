@@ -1415,7 +1415,7 @@
     "dialog_copy_token_aria": "トークンをコピー",
     "dialog_client_config": "クライアント設定",
     "dialog_done": "完了",
-    "scope_locked_title": "「取引 — 確定/書き込み」に必要です",
+    "scope_locked_title": "選択した書き込み権限に必要です",
     "scope_locked_market_data_title": "「市場データ — 書き込み」に必要です",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "トークン",
@@ -1447,6 +1447,26 @@
       "classification_read": {
         "label": "分類(読み取り)",
         "description": "銘柄の分類と分類体系を読み取ります。"
+      },
+      "accounts_write": {
+        "label": "口座 — 作成/編集",
+        "description": "手動口座を作成し、口座設定を編集します。accounts:read が必要です。"
+      },
+      "holdings_write": {
+        "label": "資産 — 作成/編集",
+        "description": "手動の代替資産を作成し、資産プロフィールと評価方法を更新します。holdings:read が必要です。"
+      },
+      "portfolios_write": {
+        "label": "ポートフォリオ — 作成/編集",
+        "description": "保存済みレポート用ポートフォリオを作成または更新します。accounts:read が必要です。"
+      },
+      "financial_planning_write": {
+        "label": "資産計画 — 書き込み",
+        "description": "目標、資金配分計画、拠出上限を作成または更新します。financial-planning:read が必要です。"
+      },
+      "taxonomies_write": {
+        "label": "分類体系 — 書き込み",
+        "description": "ユーザー所有の資産分類体系とカテゴリを作成または更新します。classification:read が必要です。"
       },
       "activities_draft": {
         "label": "取引 — 下書き",

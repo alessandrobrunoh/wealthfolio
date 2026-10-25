@@ -146,8 +146,17 @@ export function PatCreateDialog({
     const description = scopeDescription(t, scope.key);
     const lockedByMarketData =
       scope.key === "holdings:read" && selectedScopes.includes("market-data:write");
+    const lockedByDomainWrite =
+      (scope.key === "accounts:read" &&
+        (selectedScopes.includes("accounts:write") ||
+          selectedScopes.includes("portfolios:write"))) ||
+      (scope.key === "holdings:read" && selectedScopes.includes("holdings:write")) ||
+      (scope.key === "financial-planning:read" &&
+        selectedScopes.includes("financial-planning:write")) ||
+      (scope.key === "classification:read" && selectedScopes.includes("taxonomies:write"));
     const locked =
       lockedByMarketData ||
+      lockedByDomainWrite ||
       (scope.key === "activities:draft" && selectedScopes.includes("activities:write")) ||
       (scope.key === "classification:suggest" && selectedScopes.includes("classification:write"));
     const lockedTitle = lockedByMarketData

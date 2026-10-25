@@ -1415,7 +1415,7 @@
     "dialog_copy_token_aria": "复制令牌",
     "dialog_client_config": "客户端配置",
     "dialog_done": "完成",
-    "scope_locked_title": "由“活动”所需——提交/写入",
+    "scope_locked_title": "所选写入权限需要此权限",
     "scope_locked_market_data_title": "由“市场数据——写入”所需",
     "dialog_scope_aria": "{{label}}：{{description}}",
     "token_label": "令牌",
@@ -1447,6 +1447,26 @@
       "classification_read": {
         "label": "分类（读取）",
         "description": "读取金融工具分类和分类法。"
+      },
+      "accounts_write": {
+        "label": "账户 — 创建/编辑",
+        "description": "创建手动账户并编辑账户设置。需要 accounts:read。"
+      },
+      "holdings_write": {
+        "label": "资产 — 创建/编辑",
+        "description": "创建手动另类资产，并更新资产资料和估值模式。需要 holdings:read。"
+      },
+      "portfolios_write": {
+        "label": "投资组合 — 创建/编辑",
+        "description": "创建或更新已保存的报告投资组合。需要 accounts:read。"
+      },
+      "financial_planning_write": {
+        "label": "财务规划 — 写入",
+        "description": "创建或更新目标、目标资金计划和缴款限额。需要 financial-planning:read。"
+      },
+      "taxonomies_write": {
+        "label": "分类法 — 写入",
+        "description": "创建或更新用户拥有的资产分类法和类别。需要 classification:read。"
       },
       "activities_draft": {
         "label": "活动——草稿",

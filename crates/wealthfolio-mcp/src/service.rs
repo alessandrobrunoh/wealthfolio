@@ -11,7 +11,8 @@ use crate::handler::WealthfolioMcpHandler;
 
 /// Builds the Wealthfolio MCP Streamable HTTP service.
 ///
-/// Defaults: the full MCP catalog (read + draft/suggest + commit tools,
+/// Defaults: the full MCP catalog (read + draft/suggest + commit, import,
+/// activity update, transfer, quote, and user-managed entity tools, all
 /// scope-filtered per token at the boundary), no audit sink, no instructions.
 /// Hosts must serve the result behind authentication middleware that
 /// injects [`crate::auth::McpAuthContext`] — the handler fails closed

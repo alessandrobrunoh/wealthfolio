@@ -1432,7 +1432,7 @@
     "dialog_copy_token_aria": "Token kopieren",
     "dialog_client_config": "Client-Konfiguration",
     "dialog_done": "Fertig",
-    "scope_locked_title": "Erforderlich für Aktivitäten — bestätigen/schreiben",
+    "scope_locked_title": "Von einer ausgewählten Schreibberechtigung benötigt",
     "scope_locked_market_data_title": "Erforderlich für Marktdaten — schreiben",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "Token",
@@ -1464,6 +1464,26 @@
       "classification_read": {
         "label": "Klassifizierung (Lesen)",
         "description": "Instrumentenklassifizierungen und Taxonomien lesen."
+      },
+      "accounts_write": {
+        "label": "Konten — erstellen/bearbeiten",
+        "description": "Manuelle Konten erstellen und Kontoeinstellungen bearbeiten. Erfordert Konten (Lesen)."
+      },
+      "holdings_write": {
+        "label": "Vermögenswerte — erstellen/bearbeiten",
+        "description": "Manuelle alternative Vermögenswerte erstellen sowie Profile und Bewertungsmodus bearbeiten. Erfordert Bestände (Lesen)."
+      },
+      "portfolios_write": {
+        "label": "Portfolios — erstellen/bearbeiten",
+        "description": "Gespeicherte Berichtsportfolios erstellen oder bearbeiten. Erfordert Konten (Lesen)."
+      },
+      "financial_planning_write": {
+        "label": "Finanzplanung — schreiben",
+        "description": "Ziele, Finanzierungspläne und Einzahlungsgrenzen erstellen oder bearbeiten. Erfordert Finanzplanung (Lesen)."
+      },
+      "taxonomies_write": {
+        "label": "Taxonomien — schreiben",
+        "description": "Benutzereigene Asset-Taxonomien und Kategorien erstellen oder bearbeiten. Erfordert Klassifizierung (Lesen)."
       },
       "activities_draft": {
         "label": "Aktivitäten — Entwurf",
