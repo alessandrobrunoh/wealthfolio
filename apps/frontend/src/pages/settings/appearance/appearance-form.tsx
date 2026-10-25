@@ -20,6 +20,7 @@ import { Item, ItemActions, ItemContent, ItemTitle } from "@wealthfolio/ui/compo
 import { usePlatform } from "@/hooks/use-platform";
 import { useSettingsContext } from "@/lib/settings-provider";
 import { useNavigationMode } from "@/pages/layouts/navigation/navigation-mode-context";
+import { useConnectNavVisibility } from "@/pages/layouts/navigation/connect-nav-visibility";
 
 interface AppearanceFormValues {
   theme: "light" | "dark" | "system";
@@ -32,6 +33,7 @@ export function AppearanceForm() {
   const { settings, updateSettings } = useSettingsContext();
   const { isMobile, isMacOS, isTauri } = usePlatform();
   const { mode: navigationMode, setMode: setNavigationMode } = useNavigationMode();
+  const [connectNavVisible, setConnectNavVisible] = useConnectNavVisibility();
   const appearanceFormSchema = z.object({
     theme: z.enum(["light", "dark", "system"], {
       required_error: t("settings:appearance_theme_required"),
@@ -128,6 +130,22 @@ export function AppearanceForm() {
             />
           </div>
         )}
+
+        <Item variant="outline" size="sm">
+          <ItemContent>
+            <ItemTitle>{t("settings:appearance_connect_navigation")}</ItemTitle>
+            <p className="text-muted-foreground text-sm">
+              {t("settings:appearance_connect_navigation_description")}
+            </p>
+          </ItemContent>
+          <ItemActions>
+            <Switch
+              checked={connectNavVisible}
+              onCheckedChange={(visible) => setConnectNavVisible(visible)}
+              aria-label={t("settings:appearance_connect_navigation")}
+            />
+          </ItemActions>
+        </Item>
 
         {!isMobile && !(isTauri && isMacOS) && (
           <FormField
