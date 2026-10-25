@@ -12,6 +12,7 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { type NavLink, type NavigationProps, isPathActive } from "./app-navigation";
+import { useConnectNavVisibility } from "./connect-nav-visibility";
 import { resolveNavigationIcon } from "./navigation-icons";
 
 interface MobileNavBarProps {
@@ -53,6 +54,7 @@ export function MobileNavBar({ navigation }: MobileNavBarProps) {
   const closeMenu = () => setMobileMenuOpen(false);
   const { triggerHaptic } = useHapticFeedback();
   const uniqueId = useId();
+  const [connectNavVisible] = useConnectNavVisibility();
   const { status: syncStatus } = useAggregatedSyncStatus();
 
   const containerClassName = "pointer-events-none fixed inset-x-0 bottom-0 z-50";
@@ -95,11 +97,15 @@ export function MobileNavBar({ navigation }: MobileNavBarProps) {
   const standardMenuItems: NavLink[] = [
     ...primaryItems.slice(visiblePrimaryCount),
     ...secondaryItems,
-    {
-      title: t("common:connect"),
-      href: "/connect",
-      icon: <SyncStatusIcon status={syncStatus} className="size-6" />,
-    },
+    ...(connectNavVisible
+      ? [
+          {
+            title: t("common:connect"),
+            href: "/connect",
+            icon: <SyncStatusIcon status={syncStatus} className="size-6" />,
+          },
+        ]
+      : []),
   ];
   const moreItems = [...standardMenuItems, ...addonItems];
   const hasMenu = moreItems.length > 0;

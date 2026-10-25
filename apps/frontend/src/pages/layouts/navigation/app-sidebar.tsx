@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { type NavLink, type NavigationProps, isPathActive } from "./app-navigation";
 import { ConnectNavItem } from "./connect-nav-item";
+import { useConnectNavVisibility } from "./connect-nav-visibility";
 import { resolveNavigationIcon } from "./navigation-icons";
 
 interface AppSidebarProps {
@@ -30,6 +31,7 @@ export function AppSidebar({ navigation }: AppSidebarProps) {
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(true);
   const { logout, requiresAuth } = useAuth();
+  const [connectNavVisible] = useConnectNavVisibility();
   const addonMenuItems = navigation?.addonMenuItems ?? navigation?.addons ?? [];
 
   return (
@@ -152,7 +154,7 @@ export function AppSidebar({ navigation }: AppSidebarProps) {
             </div>
 
             <div className="flex shrink-0 flex-col p-2">
-              <ConnectNavItem collapsed={collapsed} />
+              {connectNavVisible && <ConnectNavItem collapsed={collapsed} />}
               {navigation?.secondary?.map((item) => (
                 <NavItem key={item.title} item={item} collapsed={collapsed} />
               ))}

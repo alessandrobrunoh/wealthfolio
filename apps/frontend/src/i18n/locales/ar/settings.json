@@ -473,6 +473,8 @@
   "appearance_font_title": "عائلة الخط",
   "appearance_menu_bar": "إظهار شريط القوائم",
   "appearance_menu_bar_description": "بدّل لعرض شريط قوائم التطبيق.",
+  "appearance_connect_navigation": "إظهار Wealthfolio Connect في شريط التنقل",
+  "appearance_connect_navigation_description": "إخفاء أيقونة Connect من الشريط الجانبي وأشرطة التنقل. تظل صفحات Connect وإعداداته متاحة.",
   "appearance_navigation_description": "اختر طريقة التنقل على الشاشات الكبيرة.",
   "appearance_navigation_title": "التنقل",
   "appearance_theme_description": "اختر السمة المفضلة للتطبيق.",
