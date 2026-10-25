@@ -95,6 +95,7 @@ const PRESET_JSONS: &[(&str, &str)] = &[
     ("au", include_str!("../../seeds/presets/au.json")),
     ("nz", include_str!("../../seeds/presets/nz.json")),
     ("se", include_str!("../../seeds/presets/se.json")),
+    ("it", include_str!("../../seeds/presets/it.json")),
 ];
 
 /// Parse all bundled presets. Bad JSON (or schema-mismatched files) is logged
@@ -358,7 +359,9 @@ mod tests {
 
     #[test]
     fn bundled_presets_have_unique_keys_and_valid_regexes() {
-        for preset_id in ["us", "ca", "gb", "es", "de", "fr", "nl", "au", "nz", "se"] {
+        for preset_id in [
+            "us", "ca", "gb", "es", "de", "fr", "nl", "au", "nz", "se", "it",
+        ] {
             let preset = load_preset(preset_id).expect("preset should load");
             assert_eq!(preset.preset_id, preset_id);
             assert!(!preset.rules.is_empty(), "preset {preset_id} has no rules");
@@ -384,6 +387,12 @@ mod tests {
                     rule.key
                 );
                 if rule.match_type == "regex" {
+                    assert!(
+                        rule.pattern.len() <= crate::categorization_rules::MAX_REGEX_PATTERN_LEN,
+                        "regex in preset {} rule {} exceeds the service limit",
+                        preset.preset_id,
+                        rule.key
+                    );
                     crate::categorization_rules::compile_regex_pattern(&rule.pattern)
                         .unwrap_or_else(|err| {
                             panic!(
@@ -393,6 +402,83 @@ mod tests {
                         });
                 }
             }
+        }
+    }
+
+    #[test]
+    fn italian_merchants_match_specific_categories() {
+        for (notes, category) in [
+            ("PAGAMENTO CONAD CITY", "groceries"),
+            ("COOP ALLEANZA 3.0", "groceries"),
+            ("SUPERMERCATO EUROSPIN", "groceries"),
+            ("PANIFICIO DA MARCO", "food_coffee"),
+            ("TRATTORIA DA NINO", "food_restaurants"),
+            ("GLOVO ITALIA", "food_delivery"),
+            ("UBER EATS ORDER", "food_delivery"),
+            ("ENOTECA SIGNORVINO", "food_alcohol"),
+            ("ENI STATION", "transport_gas"),
+            ("ENI PLENITUDE BOLLETTA", "housing_utilities"),
+            ("BE CHARGE", "transport_gas"),
+            ("TRENITALIA FRECCIAROSSA", "transport_public"),
+            ("ATM MILANO ABBONAMENTO", "transport_public"),
+            ("FREENOW ITALIA", "transport_rideshare"),
+            ("TELEPASS AUTOSTRADE", "transport_parking"),
+            ("REVISIONE AUTO NORauto", "transport_maintenance"),
+            ("ITA AIRWAYS", "travel"),
+            ("HOTEL BOOKING.COM", "travel"),
+            ("ABBONAMENTO NOW TV", "entertainment_streaming"),
+            ("OPENAI CHATGPT", "bills_software"),
+            ("ILIAD MOBILE", "bills_phone"),
+            ("FASTWEB FIBRA", "bills_internet"),
+            ("ENEL ENERGIA", "housing_utilities"),
+            ("ACEA ATO 2", "housing_utilities"),
+            ("CANONE AFFITTO", "housing_rent"),
+            ("GENERALI RC AUTO", "transport_insurance"),
+            ("POLIZZA CASA ALLIANZ", "housing_insurance"),
+            ("EATALY RISTORANTE MILANO", "food_restaurants"),
+            ("EATALY FOOD MARKET", "groceries"),
+            ("ACQUISTO AMAZON.IT", "shopping_online"),
+            ("OVS ITALIA", "shopping_clothing"),
+            ("CISALFA SPORT", "shopping_clothing"),
+            ("UNIEURO", "shopping_electronics"),
+            ("MONDO CONVENIENZA", "shopping_home"),
+            ("FARMACIA DR. MAX", "health_pharmacy"),
+            ("HUMANITAS OSPEDALE", "health_medical"),
+            ("DENTALPRO", "health_dental"),
+            ("OTTICA SALMOIRAGHI", "health_vision"),
+            ("UNISALUTE", "health_insurance"),
+            ("FITACTIVE", "health_fitness"),
+            ("ACQUA E SAPONE", "personal"),
+            ("TICKETONE", "entertainment_movies"),
+            ("STEAM GAMES", "entertainment_games"),
+            ("LIBRERIA FELTRINELLI", "shopping"),
+            ("LIBRERIE COOP", "shopping"),
+            ("TASSE UNIVERSITARIE", "education"),
+            ("DONAZIONE EMERGENCY", "gifts"),
+            ("COMMISSIONE BONIFICO", "fees_bank"),
+            ("PAGAMENTO F24 AGENZIA DELLE ENTRATE", "fees"),
+        ] {
+            assert_eq!(
+                match_preset("it", notes).as_deref(),
+                Some(category),
+                "{notes}"
+            );
+        }
+    }
+
+    #[test]
+    fn italian_rules_avoid_partial_and_generic_matches() {
+        for notes in [
+            "CONADIA",
+            "EUROSPINNING",
+            "ENELTEX",
+            "FASTWEBB",
+            "INTESA SANPAOLO BONIFICO SEPA",
+            "ACQUA E SAPONERIA",
+            "PENSIONE INPS",
+            "TRANSACTION 123",
+        ] {
+            assert_eq!(match_preset("it", notes), None, "{notes}");
         }
     }
 
