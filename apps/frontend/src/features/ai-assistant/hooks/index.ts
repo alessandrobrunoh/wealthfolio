@@ -2,6 +2,9 @@
 export {
   useAiProviders,
   useUpdateAiProviderSettings,
+  useCreateCustomAiProvider,
+  useUpdateCustomAiProvider,
+  useDeleteCustomAiProvider,
   useSetDefaultAiProvider,
   useAiProviderApiKey,
   useListAiModels,

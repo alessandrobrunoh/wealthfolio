@@ -8,8 +8,8 @@ use log::{debug, warn};
 use rig::{operation::Completion, AgentBuilder, DynModel};
 
 use crate::chat::provider_clients::{
-    create_anthropic_client, create_gemini_client, create_groq_client, create_ollama_client,
-    create_openai_client, create_openrouter_client, redact_secret,
+    create_anthropic_client, create_custom_openai_client, create_gemini_client, create_groq_client,
+    create_ollama_client, create_openai_client, create_openrouter_client, redact_secret,
 };
 use crate::env::AiEnvironment;
 use crate::error::AiError;
@@ -124,9 +124,14 @@ Title:",
                 .completion(model_id)
                 .into(),
             // Default to OpenAI-compatible Chat Completions: titles call no tools.
-            _ => create_openai_client(api_key, provider_id, provider_url)?
-                .chat(model_id)
-                .into(),
+            _ => {
+                let client = if provider_service.is_custom_provider(provider_id) {
+                    create_custom_openai_client(api_key, provider_id, provider_url)?
+                } else {
+                    create_openai_client(api_key, provider_id, provider_url)?
+                };
+                client.chat(model_id).into()
+            }
         };
         let mut builder = AgentBuilder::new(model);
         if provider_id == "anthropic" {

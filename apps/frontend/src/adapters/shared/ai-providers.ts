@@ -1,8 +1,10 @@
 // AI Providers Commands
 import type {
   AiProvidersResponse,
+  CreateCustomProviderRequest,
   UpdateProviderSettingsRequest,
   SetDefaultProviderRequest,
+  UpdateCustomProviderRequest,
   ListModelsResponse,
 } from "@/lib/types";
 
@@ -23,6 +25,22 @@ export const updateAiProviderSettings = async (
   request: UpdateProviderSettingsRequest,
 ): Promise<void> => {
   return invoke<void>("update_ai_provider_settings", { request });
+};
+
+export const createCustomAiProvider = async (
+  request: CreateCustomProviderRequest,
+): Promise<string> => {
+  return invoke<string>("create_custom_ai_provider", { request });
+};
+
+export const updateCustomAiProvider = async (
+  request: UpdateCustomProviderRequest,
+): Promise<void> => {
+  return invoke<void>("update_custom_ai_provider", { request });
+};
+
+export const deleteCustomAiProvider = async (providerId: string): Promise<void> => {
+  return invoke<void>("delete_custom_ai_provider", { providerId });
 };
 
 /**

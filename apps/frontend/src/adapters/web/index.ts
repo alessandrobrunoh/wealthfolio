@@ -351,9 +351,12 @@ export {
 
 // AI Providers Commands
 export {
+  createCustomAiProvider,
+  deleteCustomAiProvider,
   getAiProviders,
   listAiModels,
   setDefaultAiProvider,
+  updateCustomAiProvider,
   updateAiProviderSettings,
 } from "../shared/ai-providers";
 

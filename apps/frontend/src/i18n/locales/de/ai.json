@@ -625,6 +625,28 @@
       "repetitionBlurb": "Das Modell davon abhalten, sich zu wiederholen.",
       "otherTitle": "Sonstiges",
       "otherBlurb": "Verschiedene anbieterspezifische Optionen."
+    },
+    "customProvider": {
+      "add": "Benutzerdefinierten Anbieter hinzufügen",
+      "createTitle": "Benutzerdefinierten Anbieter hinzufügen",
+      "editTitle": "Benutzerdefinierten Anbieter bearbeiten",
+      "description": "Verbinde einen OpenAI-kompatiblen Chat-Completions-Endpunkt.",
+      "name": "Anbietername",
+      "baseUrl": "Basis-URL",
+      "baseUrlHint": "Verwende für entfernte Endpunkte HTTPS; HTTP ist nur für localhost zulässig. Gib den API-Basispfad ohne /chat/completions an.",
+      "defaultModel": "Standardmodell-ID",
+      "models": "Verfügbare Modell-IDs",
+      "modelsHint": "Gib eine Modell-ID pro Zeile oder durch Kommas getrennt ein.",
+      "create": "Anbieter erstellen",
+      "edit": "Benutzerdefinierten Anbieter bearbeiten",
+      "delete": "Benutzerdefinierten Anbieter löschen",
+      "deleteTitle": "Diesen benutzerdefinierten Anbieter löschen?",
+      "deleteDescription": "Anbietereinstellungen und gespeicherter API-Schlüssel werden entfernt. Vorhandene Unterhaltungen bleiben erhalten.",
+      "created": "Benutzerdefinierter Anbieter hinzugefügt",
+      "updated": "Benutzerdefinierter Anbieter aktualisiert",
+      "deleted": "Benutzerdefinierter Anbieter gelöscht",
+      "saveFailed": "Benutzerdefinierter Anbieter konnte nicht gespeichert werden",
+      "deleteFailed": "Benutzerdefinierter Anbieter konnte nicht gelöscht werden"
     }
   }
 }

@@ -663,6 +663,28 @@
       "repetitionBlurb": "Desalienta que el modelo se repita.",
       "otherTitle": "Otros",
       "otherBlurb": "Opciones varias específicas del proveedor."
+    },
+    "customProvider": {
+      "add": "Añadir proveedor personalizado",
+      "createTitle": "Añadir un proveedor personalizado",
+      "editTitle": "Editar proveedor personalizado",
+      "description": "Conecta un endpoint de Chat Completions compatible con OpenAI.",
+      "name": "Nombre del proveedor",
+      "baseUrl": "URL base",
+      "baseUrlHint": "Usa HTTPS para endpoints remotos; HTTP solo se permite para localhost. Introduce la ruta base de la API sin /chat/completions.",
+      "defaultModel": "ID del modelo predeterminado",
+      "models": "IDs de modelos disponibles",
+      "modelsHint": "Introduce un ID de modelo por línea o separados por comas.",
+      "create": "Crear proveedor",
+      "edit": "Editar proveedor personalizado",
+      "delete": "Eliminar proveedor personalizado",
+      "deleteTitle": "¿Eliminar este proveedor personalizado?",
+      "deleteDescription": "Se eliminarán la configuración del proveedor y la clave API guardada. Las conversaciones existentes no se eliminarán.",
+      "created": "Proveedor personalizado añadido",
+      "updated": "Proveedor personalizado actualizado",
+      "deleted": "Proveedor personalizado eliminado",
+      "saveFailed": "No se pudo guardar el proveedor personalizado",
+      "deleteFailed": "No se pudo eliminar el proveedor personalizado"
     }
   }
 }

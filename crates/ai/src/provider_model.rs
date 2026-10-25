@@ -19,10 +19,17 @@ where
 /// History:
 /// - v1: initial (enabled/favorite/model/url/priority/capability_overrides/tools_allowlist)
 /// - v2: adds ProviderUserSettings.tuning_overrides (purely additive, safe migration)
-pub const AI_PROVIDER_SETTINGS_SCHEMA_VERSION: u32 = 2;
+/// - v3: adds user-defined OpenAI-compatible provider profiles
+pub const AI_PROVIDER_SETTINGS_SCHEMA_VERSION: u32 = 3;
 
 /// The app_settings key used to store AI provider settings.
 pub const AI_PROVIDER_SETTINGS_KEY: &str = "ai_provider_settings";
+
+/// Prefix for user-defined OpenAI Chat Completions provider IDs.
+pub const CUSTOM_PROVIDER_ID_PREFIX: &str = "custom_openai_";
+
+/// Prefix used for logical AI provider API-key identifiers in `SecretStore`.
+pub const AI_PROVIDER_SECRET_PREFIX: &str = "ai_";
 
 // ============================================================================
 // Catalog Types (read from JSON, immutable)
@@ -362,6 +369,19 @@ impl Default for ProviderUserSettings {
     }
 }
 
+/// User-defined OpenAI Chat Completions provider metadata.
+///
+/// The base URL is stored with the per-provider user settings so existing
+/// endpoint editing and validation paths remain the source of truth.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CustomProviderSettings {
+    pub name: String,
+    pub default_model: String,
+    #[serde(default)]
+    pub models: Vec<String>,
+}
+
 /// The complete AI provider settings blob stored in app_settings.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -374,6 +394,9 @@ pub struct AiProviderSettings {
     /// Per-provider user settings keyed by provider ID.
     #[serde(default)]
     pub providers: HashMap<String, ProviderUserSettings>,
+    /// User-defined OpenAI Chat Completions providers keyed by their stable ID.
+    #[serde(default)]
+    pub custom_providers: HashMap<String, CustomProviderSettings>,
 }
 
 impl Default for AiProviderSettings {
@@ -382,6 +405,7 @@ impl Default for AiProviderSettings {
             schema_version: AI_PROVIDER_SETTINGS_SCHEMA_VERSION,
             default_provider: None,
             providers: HashMap::new(),
+            custom_providers: HashMap::new(),
         }
     }
 }
@@ -415,6 +439,10 @@ pub struct MergedProvider {
     // From catalog (immutable)
     pub id: String,
     pub name: String,
+    /// Whether this provider was created by the user rather than shipped in
+    /// the built-in catalog.
+    #[serde(default)]
+    pub is_custom: bool,
     #[serde(rename = "type")]
     pub provider_type: String,
     pub icon: String,
@@ -535,6 +563,29 @@ pub struct ModelCapabilityOverrideUpdate {
 pub struct SetDefaultProviderRequest {
     /// Provider ID to set as default, or None to clear.
     pub provider_id: Option<String>,
+}
+
+/// Request to create a user-defined OpenAI Chat Completions provider.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateCustomProviderRequest {
+    pub name: String,
+    pub base_url: String,
+    pub default_model: String,
+    #[serde(default)]
+    pub models: Vec<String>,
+}
+
+/// Request to update a user-defined OpenAI Chat Completions provider.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateCustomProviderRequest {
+    pub provider_id: String,
+    pub name: String,
+    pub base_url: String,
+    pub default_model: String,
+    #[serde(default)]
+    pub models: Vec<String>,
 }
 
 // ============================================================================

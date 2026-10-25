@@ -141,6 +141,9 @@ pub use provider_model::{
     CatalogModel,
     CatalogProvider,
     ConnectionField,
+    // Custom provider settings
+    CreateCustomProviderRequest,
+    CustomProviderSettings,
     // Provider config types
     FetchedModel,
     ListModelsResponse,
@@ -156,10 +159,13 @@ pub use provider_model::{
     ProviderDefaultConfig,
     ProviderUserSettings,
     SetDefaultProviderRequest,
+    UpdateCustomProviderRequest,
     UpdateProviderSettingsRequest,
+    AI_PROVIDER_SECRET_PREFIX,
     // Constants
     AI_PROVIDER_SETTINGS_KEY,
     AI_PROVIDER_SETTINGS_SCHEMA_VERSION,
+    CUSTOM_PROVIDER_ID_PREFIX,
 };
 
 // Provider service

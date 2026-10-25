@@ -4,22 +4,40 @@ import { Separator } from "@wealthfolio/ui/components/ui/separator";
 import { Skeleton } from "@wealthfolio/ui/components/ui/skeleton";
 import { Icons } from "@wealthfolio/ui/components/ui/icons";
 import { Button } from "@wealthfolio/ui/components/ui/button";
+import { toast } from "@wealthfolio/ui/components/ui/use-toast";
 
 import { SettingsHeader } from "../settings-header";
 import {
   ProviderSettingsCard,
+  useCreateCustomAiProvider,
+  useDeleteCustomAiProvider,
   useAiProviders,
+  useUpdateCustomAiProvider,
   useUpdateAiProviderSettings,
   useSetDefaultAiProvider,
   useAiProviderApiKey,
   useListAiModels,
 } from "@/features/ai-assistant";
 import type {
+  CreateCustomProviderRequest,
   ModelCapabilityOverrides,
   ModelCapabilityOverrideUpdate,
+  MergedProvider,
   ProviderTuningOverrides,
+  UpdateCustomProviderRequest,
 } from "@/lib/types";
 import { Alert, AlertDescription, AlertTitle } from "@wealthfolio/ui/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@wealthfolio/ui/components/ui/alert-dialog";
+import { CustomProviderDialog } from "./custom-provider-dialog";
 
 /**
  * AI Providers settings page - configure AI provider API keys and preferences.
@@ -29,6 +47,12 @@ export default function AiProvidersPage() {
   const { data, isLoading, error, refetch } = useAiProviders();
   const { mutate: updateSettings } = useUpdateAiProviderSettings();
   const { mutate: setDefault } = useSetDefaultAiProvider();
+  const createCustomProvider = useCreateCustomAiProvider();
+  const updateCustomProvider = useUpdateCustomAiProvider();
+  const deleteCustomProvider = useDeleteCustomAiProvider();
+  const [customProviderDialogOpen, setCustomProviderDialogOpen] = useState(false);
+  const [editingCustomProvider, setEditingCustomProvider] = useState<MergedProvider>();
+  const [deletingCustomProviderId, setDeletingCustomProviderId] = useState<string>();
 
   const providers = useMemo(() => data?.providers ?? [], [data?.providers]);
 
@@ -71,6 +95,58 @@ export default function AiProvidersPage() {
     overrides: ProviderTuningOverrides | null,
   ) => {
     updateSettings({ providerId, tuningOverrides: overrides });
+  };
+
+  const handleCreateCustomProvider = async (request: CreateCustomProviderRequest) => {
+    try {
+      await createCustomProvider.mutateAsync(request);
+      toast({
+        title: t("ai:providerSettings.customProvider.created"),
+        variant: "success",
+      });
+    } catch (createError) {
+      toast({
+        title: t("ai:providerSettings.customProvider.saveFailed"),
+        description: createError instanceof Error ? createError.message : String(createError),
+        variant: "destructive",
+      });
+      throw createError;
+    }
+  };
+
+  const handleUpdateCustomProvider = async (request: UpdateCustomProviderRequest) => {
+    try {
+      await updateCustomProvider.mutateAsync(request);
+      toast({
+        title: t("ai:providerSettings.customProvider.updated"),
+        variant: "success",
+      });
+    } catch (updateError) {
+      toast({
+        title: t("ai:providerSettings.customProvider.saveFailed"),
+        description: updateError instanceof Error ? updateError.message : String(updateError),
+        variant: "destructive",
+      });
+      throw updateError;
+    }
+  };
+
+  const handleDeleteCustomProvider = async () => {
+    if (!deletingCustomProviderId) return;
+    try {
+      await deleteCustomProvider.mutateAsync(deletingCustomProviderId);
+      setDeletingCustomProviderId(undefined);
+      toast({
+        title: t("ai:providerSettings.customProvider.deleted"),
+        variant: "success",
+      });
+    } catch (deleteError) {
+      toast({
+        title: t("ai:providerSettings.customProvider.deleteFailed"),
+        description: deleteError instanceof Error ? deleteError.message : String(deleteError),
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -144,6 +220,17 @@ export default function AiProvidersPage() {
         text={t("settings:ai_providers_description")}
       />
       <Separator />
+      <div className="flex justify-end">
+        <Button
+          onClick={() => {
+            setEditingCustomProvider(undefined);
+            setCustomProviderDialogOpen(true);
+          }}
+        >
+          <Icons.Plus className="me-2 h-4 w-4" />
+          {t("ai:providerSettings.customProvider.add")}
+        </Button>
+      </div>
       <div>
         {sortedProviders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -174,11 +261,60 @@ export default function AiProvidersPage() {
                 onTuningOverridesChange={(overrides) =>
                   handleTuningOverridesChange(provider.id, overrides)
                 }
+                onEditCustomProvider={() => {
+                  setEditingCustomProvider(provider);
+                  setCustomProviderDialogOpen(true);
+                }}
+                onDeleteCustomProvider={() => setDeletingCustomProviderId(provider.id)}
               />
             ))}
           </div>
         )}
       </div>
+      <CustomProviderDialog
+        open={customProviderDialogOpen}
+        provider={editingCustomProvider}
+        isSaving={createCustomProvider.isPending || updateCustomProvider.isPending}
+        onOpenChange={(open) => {
+          setCustomProviderDialogOpen(open);
+          if (!open) setEditingCustomProvider(undefined);
+        }}
+        onCreate={handleCreateCustomProvider}
+        onUpdate={handleUpdateCustomProvider}
+      />
+      <AlertDialog
+        open={deletingCustomProviderId !== undefined}
+        onOpenChange={(open) => {
+          if (!open && !deleteCustomProvider.isPending) {
+            setDeletingCustomProviderId(undefined);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("ai:providerSettings.customProvider.deleteTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("ai:providerSettings.customProvider.deleteDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteCustomProvider.isPending}>
+              {t("common:cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteCustomProvider.isPending}
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDeleteCustomProvider();
+              }}
+            >
+              {t("common:delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -192,6 +328,8 @@ function ProviderSettingsCardWrapper({
   onToggleEnabled,
   onSetDefault,
   onCustomUrlChange,
+  onEditCustomProvider,
+  onDeleteCustomProvider,
   onSelectModel,
   onSetFavoriteModels,
   onSetCapabilityOverride,
@@ -203,6 +341,8 @@ function ProviderSettingsCardWrapper({
   onToggleEnabled: (enabled: boolean) => void;
   onSetDefault: () => void;
   onCustomUrlChange: (url: string) => void;
+  onEditCustomProvider?: () => void;
+  onDeleteCustomProvider?: () => void;
   onSelectModel: (modelId: string) => void;
   onSetFavoriteModels: (
     modelIds: string[],
@@ -240,6 +380,8 @@ function ProviderSettingsCardWrapper({
       onDeleteApiKey={() => deleteApiKey.mutate()}
       onRevealApiKey={revealApiKey}
       onCustomUrlChange={onCustomUrlChange}
+      onEditCustomProvider={onEditCustomProvider}
+      onDeleteCustomProvider={onDeleteCustomProvider}
       onSelectModel={onSelectModel}
       onSetFavoriteModels={onSetFavoriteModels}
       onSetCapabilityOverride={onSetCapabilityOverride}

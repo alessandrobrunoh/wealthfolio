@@ -1,8 +1,8 @@
 use crate::profiles::ProfileAccess;
 
 use wealthfolio_ai::{
-    AiProvidersResponse, ListModelsResponse, ProviderApiError, SetDefaultProviderRequest,
-    UpdateProviderSettingsRequest,
+    AiProvidersResponse, CreateCustomProviderRequest, ListModelsResponse, ProviderApiError,
+    SetDefaultProviderRequest, UpdateCustomProviderRequest, UpdateProviderSettingsRequest,
 };
 
 use super::error::CommandResult;
@@ -22,6 +22,44 @@ pub async fn update_ai_provider_settings(
     context
         .ai_provider_service()
         .update_provider_settings(request)
+        .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn create_custom_ai_provider(
+    context: ProfileAccess,
+    request: CreateCustomProviderRequest,
+) -> CommandResult<String> {
+    let context = context.context()?;
+    Ok(context
+        .ai_provider_service()
+        .create_custom_provider(request)
+        .await?)
+}
+
+#[tauri::command]
+pub async fn update_custom_ai_provider(
+    context: ProfileAccess,
+    request: UpdateCustomProviderRequest,
+) -> CommandResult<()> {
+    let context = context.context()?;
+    context
+        .ai_provider_service()
+        .update_custom_provider(request)
+        .await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn delete_custom_ai_provider(
+    context: ProfileAccess,
+    provider_id: String,
+) -> CommandResult<()> {
+    let context = context.context()?;
+    context
+        .ai_provider_service()
+        .delete_custom_provider(&provider_id)
         .await?;
     Ok(())
 }

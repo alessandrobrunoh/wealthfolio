@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getAiProviders,
+  createCustomAiProvider,
+  updateCustomAiProvider,
+  deleteCustomAiProvider,
   updateAiProviderSettings,
   setDefaultAiProvider,
   listAiModels,
@@ -9,7 +12,12 @@ import {
   getSecret,
   deleteSecret,
 } from "@/adapters";
-import type { UpdateProviderSettingsRequest, SetDefaultProviderRequest } from "@/lib/types";
+import type {
+  CreateCustomProviderRequest,
+  UpdateCustomProviderRequest,
+  UpdateProviderSettingsRequest,
+  SetDefaultProviderRequest,
+} from "@/lib/types";
 import { QueryKeys } from "@/lib/query-keys";
 import { toast } from "@wealthfolio/ui/components/ui/use-toast";
 
@@ -36,6 +44,33 @@ export function useUpdateAiProviderSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: AI_PROVIDERS_KEY });
     },
+  });
+}
+
+export function useCreateCustomAiProvider() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: CreateCustomProviderRequest) => createCustomAiProvider(request),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: AI_PROVIDERS_KEY }),
+  });
+}
+
+export function useUpdateCustomAiProvider() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (request: UpdateCustomProviderRequest) => updateCustomAiProvider(request),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: AI_PROVIDERS_KEY }),
+  });
+}
+
+export function useDeleteCustomAiProvider() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (providerId: string) => deleteCustomAiProvider(providerId),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: AI_PROVIDERS_KEY }),
   });
 }
 

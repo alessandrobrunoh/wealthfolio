@@ -1,3 +1,5 @@
+use std::net::IpAddr;
+
 pub(crate) fn ensure_openai_v1_base_url(base_url: &str) -> String {
     let base = base_url.trim_end_matches('/');
     if base.ends_with("/v1") {
@@ -11,6 +13,31 @@ pub(crate) fn openai_compatible_models_url(base_url: &str) -> String {
     let base = base_url.trim_end_matches('/');
     let base = base.strip_suffix("/v1").unwrap_or(base);
     format!("{}/v1/models", base)
+}
+
+/// Model-list endpoint for custom providers whose configured base URL is used
+/// exactly as entered, including vendor-specific paths such as `/api/paas/v4`.
+pub(crate) fn custom_openai_compatible_models_url(base_url: &str) -> String {
+    format!("{}/models", base_url.trim_end_matches('/'))
+}
+
+/// Require TLS for remote custom providers. Plain HTTP is only accepted for
+/// loopback endpoints such as a local model server.
+pub(crate) fn custom_provider_url_is_secure(url: &reqwest::Url) -> bool {
+    if url.scheme() == "https" {
+        return true;
+    }
+    if url.scheme() != "http" {
+        return false;
+    }
+
+    url.host_str().is_some_and(|host| {
+        let host = host.trim_start_matches('[').trim_end_matches(']');
+        host.eq_ignore_ascii_case("localhost")
+            || host
+                .parse::<IpAddr>()
+                .is_ok_and(|address| address.is_loopback())
+    })
 }
 
 /// Whether the `openai` provider talks to OpenAI itself rather than an
@@ -87,6 +114,39 @@ mod tests {
                 openai_compatible_models_url(input),
                 expected,
                 "input: {input}"
+            );
+        }
+    }
+
+    #[test]
+    fn custom_models_url_preserves_vendor_specific_api_paths() {
+        assert_eq!(
+            custom_openai_compatible_models_url("https://api.z.ai/api/paas/v4/"),
+            "https://api.z.ai/api/paas/v4/models"
+        );
+        assert_eq!(
+            custom_openai_compatible_models_url("https://provider.example/v1"),
+            "https://provider.example/v1/models"
+        );
+    }
+
+    #[test]
+    fn custom_provider_urls_require_tls_except_for_loopback() {
+        for url in [
+            "http://localhost:11434/api/v1",
+            "http://127.0.0.1:8080/v1",
+            "http://[::1]:8080/v1",
+            "https://api.z.ai/api/paas/v4",
+        ] {
+            assert!(
+                custom_provider_url_is_secure(&reqwest::Url::parse(url).unwrap()),
+                "{url}"
+            );
+        }
+        for url in ["http://api.example.com/v1", "ftp://api.example.com/v1"] {
+            assert!(
+                !custom_provider_url_is_secure(&reqwest::Url::parse(url).unwrap()),
+                "{url}"
             );
         }
     }
