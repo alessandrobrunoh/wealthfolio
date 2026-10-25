@@ -550,6 +550,9 @@ pub fn run() {
             // AI provider commands
             commands::ai_providers::get_ai_providers,
             commands::ai_providers::update_ai_provider_settings,
+            commands::ai_providers::create_custom_ai_provider,
+            commands::ai_providers::update_custom_ai_provider,
+            commands::ai_providers::delete_custom_ai_provider,
             commands::ai_providers::set_default_ai_provider,
             commands::ai_providers::list_ai_models,
             // AI chat commands

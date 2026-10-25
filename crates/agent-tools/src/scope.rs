@@ -19,6 +19,11 @@ pub enum AgentScope {
     FinancialPlanningRead,
     HealthRead,
     ClassificationRead,
+    AccountsWrite,
+    HoldingsWrite,
+    PortfoliosWrite,
+    FinancialPlanningWrite,
+    TaxonomiesWrite,
     ActivitiesDraft,
     ActivitiesWrite,
     ClassificationSuggest,
@@ -37,6 +42,11 @@ impl AgentScope {
         AgentScope::FinancialPlanningRead,
         AgentScope::HealthRead,
         AgentScope::ClassificationRead,
+        AgentScope::AccountsWrite,
+        AgentScope::HoldingsWrite,
+        AgentScope::PortfoliosWrite,
+        AgentScope::FinancialPlanningWrite,
+        AgentScope::TaxonomiesWrite,
         AgentScope::ActivitiesDraft,
         AgentScope::ActivitiesWrite,
         AgentScope::ClassificationSuggest,
@@ -67,6 +77,11 @@ impl AgentScope {
             AgentScope::FinancialPlanningRead => "financial-planning:read",
             AgentScope::HealthRead => "health:read",
             AgentScope::ClassificationRead => "classification:read",
+            AgentScope::AccountsWrite => "accounts:write",
+            AgentScope::HoldingsWrite => "holdings:write",
+            AgentScope::PortfoliosWrite => "portfolios:write",
+            AgentScope::FinancialPlanningWrite => "financial-planning:write",
+            AgentScope::TaxonomiesWrite => "taxonomies:write",
             AgentScope::ActivitiesDraft => "activities:draft",
             AgentScope::ActivitiesWrite => "activities:write",
             AgentScope::ClassificationSuggest => "classification:suggest",
@@ -192,6 +207,37 @@ impl AgentScopeSet {
                     .to_string(),
             );
         }
+        for (write, read, label) in [
+            (
+                AgentScope::AccountsWrite,
+                AgentScope::AccountsRead,
+                "accounts:write requires accounts:read",
+            ),
+            (
+                AgentScope::HoldingsWrite,
+                AgentScope::HoldingsRead,
+                "holdings:write requires holdings:read",
+            ),
+            (
+                AgentScope::PortfoliosWrite,
+                AgentScope::AccountsRead,
+                "portfolios:write requires accounts:read",
+            ),
+            (
+                AgentScope::FinancialPlanningWrite,
+                AgentScope::FinancialPlanningRead,
+                "financial-planning:write requires financial-planning:read",
+            ),
+            (
+                AgentScope::TaxonomiesWrite,
+                AgentScope::ClassificationRead,
+                "taxonomies:write requires classification:read",
+            ),
+        ] {
+            if self.contains(write) && !self.contains(read) {
+                return Some(label.to_string());
+            }
+        }
         None
     }
 }
@@ -215,7 +261,7 @@ mod tests {
 
     #[test]
     fn parse_rejects_unknown() {
-        assert_eq!(AgentScope::parse("accounts:write"), None);
+        assert_eq!(AgentScope::parse("unknown:write"), None);
         assert_eq!(AgentScope::parse(""), None);
     }
 
@@ -236,6 +282,11 @@ mod tests {
         assert!(!set.contains(AgentScope::ClassificationSuggest));
         assert!(!set.contains(AgentScope::ClassificationWrite));
         assert!(!set.contains(AgentScope::MarketDataWrite));
+        assert!(!set.contains(AgentScope::AccountsWrite));
+        assert!(!set.contains(AgentScope::HoldingsWrite));
+        assert!(!set.contains(AgentScope::PortfoliosWrite));
+        assert!(!set.contains(AgentScope::FinancialPlanningWrite));
+        assert!(!set.contains(AgentScope::TaxonomiesWrite));
     }
 
     #[test]
@@ -287,5 +338,25 @@ mod tests {
 
         set.insert(AgentScope::HoldingsRead);
         assert!(set.dependency_error().is_none());
+    }
+
+    #[test]
+    fn domain_write_scopes_require_the_matching_read_scope() {
+        for (write, read) in [
+            (AgentScope::AccountsWrite, AgentScope::AccountsRead),
+            (AgentScope::HoldingsWrite, AgentScope::HoldingsRead),
+            (AgentScope::PortfoliosWrite, AgentScope::AccountsRead),
+            (
+                AgentScope::FinancialPlanningWrite,
+                AgentScope::FinancialPlanningRead,
+            ),
+            (AgentScope::TaxonomiesWrite, AgentScope::ClassificationRead),
+        ] {
+            let mut set = AgentScopeSet::new();
+            set.insert(write);
+            assert!(set.dependency_error().is_some(), "{write}");
+            set.insert(read);
+            assert!(set.dependency_error().is_none(), "{write}");
+        }
     }
 }

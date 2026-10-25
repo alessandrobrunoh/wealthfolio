@@ -625,6 +625,28 @@
       "repetitionBlurb": "抑制模型自我重複。",
       "otherTitle": "其他",
       "otherBlurb": "供應商專屬的其他選項。"
+    },
+    "customProvider": {
+      "add": "新增自訂供應商",
+      "createTitle": "新增自訂供應商",
+      "editTitle": "編輯自訂供應商",
+      "description": "連線至相容 OpenAI Chat Completions 的端點。",
+      "name": "供應商名稱",
+      "baseUrl": "基底 URL",
+      "baseUrlHint": "遠端端點請使用 HTTPS；HTTP 僅允許用於 localhost。輸入不含 /chat/completions 後綴的 API 基底路徑。",
+      "defaultModel": "預設模型 ID",
+      "models": "可用模型 ID",
+      "modelsHint": "每行輸入一個模型 ID，或以逗號分隔。",
+      "create": "建立供應商",
+      "edit": "編輯自訂供應商",
+      "delete": "刪除自訂供應商",
+      "deleteTitle": "要刪除此自訂供應商嗎？",
+      "deleteDescription": "供應商設定和已儲存的 API 金鑰會一併移除，現有對話不會刪除。",
+      "created": "已新增自訂供應商",
+      "updated": "已更新自訂供應商",
+      "deleted": "已刪除自訂供應商",
+      "saveFailed": "無法儲存自訂供應商",
+      "deleteFailed": "無法刪除自訂供應商"
     }
   }
 }

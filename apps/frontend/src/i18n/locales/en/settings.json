@@ -1391,7 +1391,7 @@
     "dialog_copy_token_aria": "Copy token",
     "dialog_client_config": "Client configuration",
     "dialog_done": "Done",
-    "scope_locked_title": "Required by Activities — commit/write",
+    "scope_locked_title": "Required by a selected write permission",
     "scope_locked_market_data_title": "Required by Market data — write",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "Token",
@@ -1423,6 +1423,26 @@
       "classification_read": {
         "label": "Classification (read)",
         "description": "Read instrument classifications and taxonomies."
+      },
+      "accounts_write": {
+        "label": "Accounts — create/edit",
+        "description": "Create manual accounts and edit account settings. Requires accounts:read."
+      },
+      "holdings_write": {
+        "label": "Assets — create/edit",
+        "description": "Create manual alternative assets and update asset profiles and pricing mode. Requires holdings:read."
+      },
+      "portfolios_write": {
+        "label": "Portfolios — create/edit",
+        "description": "Create or update saved reporting portfolios. Requires accounts:read."
+      },
+      "financial_planning_write": {
+        "label": "Financial planning — write",
+        "description": "Create or update goals, goal funding plans, and contribution limits. Requires financial-planning:read."
+      },
+      "taxonomies_write": {
+        "label": "Taxonomies — write",
+        "description": "Create or update user-owned asset taxonomies and categories. Requires classification:read."
       },
       "activities_draft": {
         "label": "Activities — draft",

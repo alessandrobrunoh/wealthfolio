@@ -287,6 +287,43 @@ function lastCall(mock: ReturnType<typeof stubFetch>) {
   return { url, method: (init as RequestInit & { method: string }).method, body: init.body };
 }
 
+describe("custom AI provider transport", () => {
+  const createRequest = {
+    name: "Z.AI",
+    baseUrl: "https://api.z.ai/api/paas/v4",
+    defaultModel: "glm-5.3",
+    models: ["glm-5.3"],
+  };
+
+  it("creates a provider profile through the shared API route", async () => {
+    const mock = stubFetch("custom_openai_fixture");
+    await invoke("create_custom_ai_provider", { request: createRequest });
+    const { url, method, body } = lastCall(mock);
+    expect(url).toBe("/api/v1/ai/providers/custom");
+    expect(method).toBe("POST");
+    expect(JSON.parse(body as string)).toEqual(createRequest);
+  });
+
+  it("updates a provider profile through the shared API route", async () => {
+    const mock = stubFetch(null);
+    const request = { ...createRequest, providerId: "custom_openai_fixture" };
+    await invoke("update_custom_ai_provider", { request });
+    const { url, method, body } = lastCall(mock);
+    expect(url).toBe("/api/v1/ai/providers/custom");
+    expect(method).toBe("PUT");
+    expect(JSON.parse(body as string)).toEqual(request);
+  });
+
+  it("deletes a provider profile by its encoded ID", async () => {
+    const mock = stubFetch(null);
+    await invoke("delete_custom_ai_provider", { providerId: "custom_openai_fixture" });
+    const { url, method, body } = lastCall(mock);
+    expect(url).toBe("/api/v1/ai/providers/custom/custom_openai_fixture");
+    expect(method).toBe("DELETE");
+    expect(body).toBeUndefined();
+  });
+});
+
 describe("cloud backup action transport", () => {
   it.each([
     { action: "status" },

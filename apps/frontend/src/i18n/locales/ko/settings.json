@@ -1417,7 +1417,7 @@
     "dialog_copy_token_aria": "토큰 복사",
     "dialog_client_config": "클라이언트 구성",
     "dialog_done": "완료",
-    "scope_locked_title": "활동에 필요 — 확정/쓰기",
+    "scope_locked_title": "선택한 쓰기 권한에 필요합니다",
     "scope_locked_market_data_title": "시장 데이터 — 쓰기에 필요",
     "dialog_scope_aria": "{{label}}: {{description}}",
     "token_label": "토큰",
@@ -1449,6 +1449,26 @@
       "classification_read": {
         "label": "분류 (읽기)",
         "description": "상품 분류와 분류 체계를 읽습니다."
+      },
+      "accounts_write": {
+        "label": "계좌 — 생성/수정",
+        "description": "수동 계좌를 만들고 계좌 설정을 수정합니다. accounts:read가 필요합니다."
+      },
+      "holdings_write": {
+        "label": "자산 — 생성/수정",
+        "description": "수동 대체 자산을 만들고 자산 프로필과 평가 방식을 업데이트합니다. holdings:read가 필요합니다."
+      },
+      "portfolios_write": {
+        "label": "포트폴리오 — 생성/수정",
+        "description": "저장된 보고용 포트폴리오를 만들거나 업데이트합니다. accounts:read가 필요합니다."
+      },
+      "financial_planning_write": {
+        "label": "재무 계획 — 쓰기",
+        "description": "목표, 자금 계획, 납입 한도를 만들거나 업데이트합니다. financial-planning:read가 필요합니다."
+      },
+      "taxonomies_write": {
+        "label": "분류 체계 — 쓰기",
+        "description": "사용자 소유 자산 분류 체계와 카테고리를 만들거나 업데이트합니다. classification:read가 필요합니다."
       },
       "activities_draft": {
         "label": "거래 내역 — 초안",

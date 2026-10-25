@@ -13,6 +13,11 @@ export type ScopeKey =
   | "financial-planning:read"
   | "health:read"
   | "classification:read"
+  | "accounts:write"
+  | "holdings:write"
+  | "portfolios:write"
+  | "financial-planning:write"
+  | "taxonomies:write"
   | "activities:draft"
   | "activities:write"
   | "classification:suggest"
@@ -28,7 +33,7 @@ export interface ScopeMeta {
   group: ScopeGroup;
 }
 
-/** Ordered list of all 12 scopes, grouped reads first then write/suggest. */
+/** Ordered list of all 17 scopes, grouped reads first then write/suggest. */
 export const SCOPES: ScopeMeta[] = [
   { key: "accounts:read", i18n: "accounts_read", group: "read" },
   { key: "holdings:read", i18n: "holdings_read", group: "read" },
@@ -37,6 +42,11 @@ export const SCOPES: ScopeMeta[] = [
   { key: "financial-planning:read", i18n: "financial_planning_read", group: "read" },
   { key: "health:read", i18n: "health_read", group: "read" },
   { key: "classification:read", i18n: "classification_read", group: "read" },
+  { key: "accounts:write", i18n: "accounts_write", group: "write" },
+  { key: "holdings:write", i18n: "holdings_write", group: "write" },
+  { key: "portfolios:write", i18n: "portfolios_write", group: "write" },
+  { key: "financial-planning:write", i18n: "financial_planning_write", group: "write" },
+  { key: "taxonomies:write", i18n: "taxonomies_write", group: "write" },
   { key: "activities:draft", i18n: "activities_draft", group: "write" },
   { key: "activities:write", i18n: "activities_write", group: "write" },
   { key: "classification:suggest", i18n: "classification_suggest", group: "write" },
@@ -118,6 +128,18 @@ export function applyScopeDependencies(scopes: Iterable<string>): ScopeKey[] {
   }
   if (set.has("market-data:write")) {
     set.add("holdings:read");
+  }
+  if (set.has("accounts:write") || set.has("portfolios:write")) {
+    set.add("accounts:read");
+  }
+  if (set.has("holdings:write")) {
+    set.add("holdings:read");
+  }
+  if (set.has("financial-planning:write")) {
+    set.add("financial-planning:read");
+  }
+  if (set.has("taxonomies:write")) {
+    set.add("classification:read");
   }
   return SCOPES.filter((scope) => set.has(scope.key)).map((scope) => scope.key);
 }

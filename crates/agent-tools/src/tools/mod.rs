@@ -4,12 +4,14 @@
 //! existing name, schema, and output shape (guarded by the parity
 //! snapshots in `crates/ai/tests/`).
 
+pub mod account_writes;
 pub mod accounts;
 pub mod activities;
 pub mod activity_import;
 pub mod activity_updates;
 pub mod allocation;
 pub mod asset_classification;
+pub mod asset_profile_writes;
 pub mod asset_taxonomies;
 pub mod cash_balances;
 pub mod categorization_context;
@@ -17,19 +19,23 @@ pub mod commit_activity;
 pub mod commit_asset_classification;
 pub mod commit_categorization_rule;
 pub mod commit_transaction_categories;
+pub mod contribution_limit_writes;
 pub mod contribution_limits;
 pub mod create_categorization_rule;
+pub mod goal_writes;
 pub mod goals;
 pub mod health;
 pub mod holdings;
 pub mod income;
 pub mod net_worth;
 pub mod performance;
+pub mod portfolio_writes;
 pub mod portfolios;
 pub mod propose_categories;
 pub mod quote_import;
 pub mod record_activities;
 pub mod record_activity;
+pub mod taxonomy_writes;
 pub mod transfer_links;
 pub mod valuation;
 
@@ -135,10 +141,20 @@ pub use activity_updates::{
 };
 
 // MCP-only CSV import tools (validate + dedup-safe import pipeline).
+pub use account_writes::{CreateAccount, UpdateAccount};
 pub use activity_import::{
     ActivityImportArgs, ActivityImportRow, CommitActivityImport, CommitActivityImportOutput,
     GetImportMapping, GetImportMappingArgs, ImportPreviewSummary, ImportRowResult,
     PrepareActivityImport, PrepareActivityImportOutput,
+};
+pub use asset_profile_writes::{CreateManualAsset, GetAssetProfile, UpdateAssetProfileTool};
+pub use contribution_limit_writes::{CreateContributionLimit, UpdateContributionLimit};
+pub use goal_writes::{
+    CreateGoal, GetGoalDetails, ReplaceGoalFunding, SaveGoalPlanTool, UpdateGoal,
+};
+pub use portfolio_writes::{CreatePortfolio, UpdatePortfolio};
+pub use taxonomy_writes::{
+    CreateCategory, CreateTaxonomy, MoveCategory, UpdateCategory, UpdateTaxonomy,
 };
 
 use std::sync::Arc;
@@ -168,6 +184,11 @@ pub fn v1_read_tools() -> Vec<Arc<dyn AgentTool>> {
         Arc::new(GetNetWorth),
         Arc::new(GetContributionLimits),
     ]
+}
+
+/// MCP-only detail reads used by the corresponding entity write workflows.
+pub fn mcp_entity_read_tools() -> Vec<Arc<dyn AgentTool>> {
+    vec![Arc::new(GetGoalDetails), Arc::new(GetAssetProfile)]
 }
 
 /// The draft/suggest tools, in catalog (and LLM-visible) order. These prepare
@@ -230,6 +251,29 @@ pub fn activity_update_tools() -> Vec<Arc<dyn AgentTool>> {
     vec![
         Arc::new(PrepareActivityUpdates),
         Arc::new(CommitActivityUpdates),
+    ]
+}
+
+/// MCP-only writes for user-managed account and portfolio records.
+pub fn entity_write_tools() -> Vec<Arc<dyn AgentTool>> {
+    vec![
+        Arc::new(CreateAccount),
+        Arc::new(UpdateAccount),
+        Arc::new(CreatePortfolio),
+        Arc::new(UpdatePortfolio),
+        Arc::new(CreateGoal),
+        Arc::new(UpdateGoal),
+        Arc::new(ReplaceGoalFunding),
+        Arc::new(SaveGoalPlanTool),
+        Arc::new(CreateContributionLimit),
+        Arc::new(UpdateContributionLimit),
+        Arc::new(CreateManualAsset),
+        Arc::new(UpdateAssetProfileTool),
+        Arc::new(CreateTaxonomy),
+        Arc::new(UpdateTaxonomy),
+        Arc::new(CreateCategory),
+        Arc::new(UpdateCategory),
+        Arc::new(MoveCategory),
     ]
 }
 

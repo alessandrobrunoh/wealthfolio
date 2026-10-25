@@ -40,9 +40,9 @@ use crate::types::{
 
 use super::history::build_user_prompt;
 use super::provider_clients::{
-    create_anthropic_client, create_gemini_client, create_groq_client, create_ollama_client,
-    create_openai_client, create_openrouter_client, redact_secret, remap_provider_error,
-    validate_ollama_model_if_possible,
+    create_anthropic_client, create_custom_openai_client, create_gemini_client, create_groq_client,
+    create_ollama_client, create_openai_client, create_openrouter_client, redact_secret,
+    remap_provider_error, validate_ollama_model_if_possible,
 };
 use super::request_params::{
     anthropic_thinking_params, effective_temperature, gemini_thinking_params,
@@ -104,9 +104,15 @@ pub(super) async fn spawn_chat_stream<E: AiEnvironment + 'static>(
 
     // Get provider settings and model capabilities
     let provider_service = ProviderService::new(env.clone());
+    if !provider_service.is_supported_provider(&provider_id) {
+        return Err(AiError::InvalidInput(format!(
+            "Unknown AI provider: {provider_id}"
+        )));
+    }
     let api_key = provider_service.get_api_key(&provider_id)?;
     let provider_secret = api_key.clone();
     let provider_url = provider_service.get_provider_url(&provider_id);
+    let is_custom_provider = provider_service.is_custom_provider(&provider_id);
     let mut capabilities = provider_service.get_model_capabilities(&provider_id, &model_id);
 
     // Best-effort preflight for Ollama: if we can list models and the selected model
@@ -569,7 +575,11 @@ pub(super) async fn spawn_chat_stream<E: AiEnvironment + 'static>(
                 )
             }
             _ => {
-                let client = create_openai_client(api_key, &provider_id, provider_url)?;
+                let client = if is_custom_provider {
+                    create_custom_openai_client(api_key, &provider_id, provider_url)?
+                } else {
+                    create_openai_client(api_key, &provider_id, provider_url)?
+                };
                 build_with_tools_and_stream!(client.chat(&model_id), None::<serde_json::Value>)
             }
         }
@@ -626,7 +636,11 @@ pub(super) async fn spawn_chat_stream<E: AiEnvironment + 'static>(
                 )
             }
             _ => {
-                let client = create_openai_client(api_key, &provider_id, provider_url)?;
+                let client = if is_custom_provider {
+                    create_custom_openai_client(api_key, &provider_id, provider_url)?
+                } else {
+                    create_openai_client(api_key, &provider_id, provider_url)?
+                };
                 build_without_tools_and_stream!(client.chat(&model_id), None::<serde_json::Value>)
             }
         }

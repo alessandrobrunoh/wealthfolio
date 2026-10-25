@@ -19,7 +19,7 @@ use rig::providers::{
 use std::time::Duration;
 
 use crate::error::AiError;
-use crate::provider_urls::ensure_openai_v1_base_url;
+use crate::provider_urls::{custom_provider_url_is_secure, ensure_openai_v1_base_url};
 
 /// Every provider sends through the app's shared HTTP client (proxy and TLS
 /// settings included).
@@ -89,6 +89,28 @@ pub(crate) fn create_openai_client(
 ) -> Result<OpenAI, AiError> {
     let key = require_key(api_key, provider_id)?;
     openai_shaped_client(OpenAIConfig::new(key), provider_url)
+}
+
+/// Client for a user-defined OpenAI Chat Completions endpoint. Unlike built-in
+/// provider overrides, the custom profile's base URL is already the complete
+/// API prefix and must not be normalized by appending `/v1`.
+pub(crate) fn create_custom_openai_client(
+    api_key: Option<String>,
+    provider_id: &str,
+    provider_url: Option<String>,
+) -> Result<OpenAI, AiError> {
+    let key = require_key(api_key, provider_id)?;
+    let url = provider_url
+        .ok_or_else(|| AiError::InvalidInput("Custom provider base URL is missing".to_string()))?;
+    let parsed_url = reqwest::Url::parse(&url)
+        .map_err(|_| AiError::InvalidInput("Custom provider base URL is invalid".to_string()))?;
+    if !custom_provider_url_is_secure(&parsed_url) || parsed_url.host().is_none() {
+        return Err(AiError::InvalidInput(
+            "Custom provider base URL must use HTTPS or HTTP on a loopback host".to_string(),
+        ));
+    }
+    let config = OpenAIConfig::new(key).with_base_url(url.trim_end_matches('/'));
+    Ok(config.connect(http()))
 }
 
 pub(crate) fn create_openrouter_client(
@@ -1077,13 +1099,23 @@ pub(crate) mod transport_tests {
         thinking: bool,
         provider_settings: serde_json::Value,
     ) -> Vec<(String, serde_json::Value)> {
+        chat_through_service_with_url_path(provider, model, thinking, provider_settings, "").await
+    }
+
+    async fn chat_through_service_with_url_path(
+        provider: &str,
+        model: &str,
+        thinking: bool,
+        provider_settings: serde_json::Value,
+        url_path: &str,
+    ) -> Vec<(String, serde_json::Value)> {
         use crate::chat::{ChatConfig, ChatService};
         use crate::env::test_env::{MockEnvironment, MockSettingsService};
         use crate::provider_model::AI_PROVIDER_SETTINGS_KEY;
         use crate::types::{AiStreamEvent, ChatModelConfig, SendMessageRequest};
 
         let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
-        let url = format!("http://{}", listener.local_addr().unwrap());
+        let url = format!("http://{}{url_path}", listener.local_addr().unwrap());
         let fixture = if provider == "google" {
             "gemini"
         } else {
@@ -1094,7 +1126,22 @@ pub(crate) mod transport_tests {
         let mut user = provider_settings;
         user["enabled"] = serde_json::json!(true);
         user["customUrl"] = serde_json::json!(url);
-        let settings = serde_json::json!({ "schemaVersion": 2, "providers": { provider: user } });
+        let mut custom_providers = serde_json::Map::new();
+        if provider.starts_with(crate::provider_model::CUSTOM_PROVIDER_ID_PREFIX) {
+            custom_providers.insert(
+                provider.to_string(),
+                serde_json::json!({
+                    "name": "Fixture custom provider",
+                    "defaultModel": model,
+                    "models": [model]
+                }),
+            );
+        }
+        let settings = serde_json::json!({
+            "schemaVersion": 3,
+            "customProviders": custom_providers,
+            "providers": { provider: user }
+        });
         let mut env = MockEnvironment::new().with_secret(&format!("ai_{provider}"), "fixture-key");
         env.settings_service = Arc::new(MockSettingsService {
             settings: std::sync::RwLock::new(std::collections::HashMap::from([(
@@ -1551,6 +1598,28 @@ pub(crate) mod transport_tests {
         assert!(line.starts_with("POST /v1/chat/completions "), "{line}");
         assert!(body.get("temperature").is_none());
         assert!(body.get("store").is_none());
+        assert!(!body["tools"].as_array().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn custom_provider_preserves_vendor_base_path_for_chat_completions() {
+        let provider_id = format!(
+            "{}fixture",
+            crate::provider_model::CUSTOM_PROVIDER_ID_PREFIX
+        );
+        let chats = chat_through_service_with_url_path(
+            &provider_id,
+            "glm-5.3",
+            false,
+            serde_json::json!({}),
+            "/api/paas/v4",
+        )
+        .await;
+        let (line, body) = &chats[0];
+        assert!(
+            line.starts_with("POST /api/paas/v4/chat/completions "),
+            "{line}"
+        );
         assert!(!body["tools"].as_array().unwrap().is_empty());
     }
 

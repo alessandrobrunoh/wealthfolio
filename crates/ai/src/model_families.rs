@@ -7,7 +7,7 @@
 //! it builds a request, so these rules work from the ID alone and need no
 //! extra request to the provider.
 
-use crate::provider_model::ModelCapabilities;
+use crate::provider_model::{ModelCapabilities, CUSTOM_PROVIDER_ID_PREFIX};
 
 /// `(major, minor)` read from the first one- or two-digit numbers after
 /// `prefix`. Longer numbers are date stamps (`claude-opus-4-20250514`) and
@@ -129,6 +129,14 @@ fn no_capabilities() -> ModelCapabilities {
 /// everything off.
 fn default_capabilities(provider_id: &str, model_id: &str) -> ModelCapabilities {
     match provider_id {
+        id if id.starts_with(CUSTOM_PROVIDER_ID_PREFIX) => ModelCapabilities {
+            // Chat Completions providers commonly support tool calls. Keep
+            // reasoning and vision opt-in because those vary by model.
+            tools: true,
+            thinking: false,
+            vision: false,
+            streaming: true,
+        },
         // Every Claude model the API still serves takes tools and images and
         // can think (adaptive on 4.6+, a budget before that). Other IDs on a
         // custom Anthropic-compatible endpoint get nothing assumed.

@@ -1434,7 +1434,7 @@
     "dialog_copy_token_aria": "複製權杖",
     "dialog_client_config": "用戶端設定",
     "dialog_done": "完成",
-    "scope_locked_title": "「交易紀錄 — 提交／寫入」需要此權限",
+    "scope_locked_title": "所選寫入權限需要此權限",
     "scope_locked_market_data_title": "「市場資料 — 寫入」需要此權限",
     "dialog_scope_aria": "{{label}}：{{description}}",
     "token_label": "權杖",
@@ -1466,6 +1466,26 @@
       "classification_read": {
         "label": "分類（讀取）",
         "description": "讀取金融工具分類與分類法。"
+      },
+      "accounts_write": {
+        "label": "帳戶 — 建立/編輯",
+        "description": "建立手動帳戶並編輯帳戶設定。需要 accounts:read。"
+      },
+      "holdings_write": {
+        "label": "資產 — 建立/編輯",
+        "description": "建立手動替代資產，並更新資產資料與估值模式。需要 holdings:read。"
+      },
+      "portfolios_write": {
+        "label": "投資組合 — 建立/編輯",
+        "description": "建立或更新已儲存的報表投資組合。需要 accounts:read。"
+      },
+      "financial_planning_write": {
+        "label": "財務規劃 — 寫入",
+        "description": "建立或更新目標、目標資金計畫與投入限額。需要 financial-planning:read。"
+      },
+      "taxonomies_write": {
+        "label": "分類法 — 寫入",
+        "description": "建立或更新使用者擁有的資產分類法與類別。需要 classification:read。"
       },
       "activities_draft": {
         "label": "交易紀錄 — 草稿",

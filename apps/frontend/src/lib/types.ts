@@ -2164,6 +2164,7 @@ export interface MergedProvider {
   // From catalog (immutable)
   id: string;
   name: string;
+  isCustom?: boolean;
   type: string;
   icon: string;
   description: string;
@@ -2238,6 +2239,17 @@ export interface UpdateProviderSettingsRequest {
   toolsAllowlist?: string[] | null;
   /** Update user tuning overrides. null = reset to catalog defaults, {} or partial = set. */
   tuningOverrides?: ProviderTuningOverrides | null;
+}
+
+export interface CreateCustomProviderRequest {
+  name: string;
+  baseUrl: string;
+  defaultModel: string;
+  models: string[];
+}
+
+export interface UpdateCustomProviderRequest extends CreateCustomProviderRequest {
+  providerId: string;
 }
 
 /**

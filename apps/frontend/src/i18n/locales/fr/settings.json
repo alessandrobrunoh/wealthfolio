@@ -1474,7 +1474,7 @@
     "dialog_copy_token_aria": "Copier le jeton",
     "dialog_client_config": "Configuration du client",
     "dialog_done": "Terminé",
-    "scope_locked_title": "Requis par Activités — valider/écrire",
+    "scope_locked_title": "Requis par une autorisation d'écriture sélectionnée",
     "scope_locked_market_data_title": "Requis par Données de marché — écrire",
     "dialog_scope_aria": "{{label}} : {{description}}",
     "token_label": "Jeton",
@@ -1506,6 +1506,26 @@
       "classification_read": {
         "label": "Classification (lecture)",
         "description": "Lire les classifications d'instruments et les taxonomies."
+      },
+      "accounts_write": {
+        "label": "Comptes — créer/modifier",
+        "description": "Créer des comptes manuels et modifier leurs paramètres. Nécessite accounts:read."
+      },
+      "holdings_write": {
+        "label": "Actifs — créer/modifier",
+        "description": "Créer des actifs alternatifs manuels et modifier les profils et le mode de valorisation. Nécessite holdings:read."
+      },
+      "portfolios_write": {
+        "label": "Portefeuilles — créer/modifier",
+        "description": "Créer ou modifier des portefeuilles de reporting enregistrés. Nécessite accounts:read."
+      },
+      "financial_planning_write": {
+        "label": "Planification financière — écriture",
+        "description": "Créer ou modifier des objectifs, leurs plans de financement et les plafonds de cotisation. Nécessite financial-planning:read."
+      },
+      "taxonomies_write": {
+        "label": "Taxonomies — écriture",
+        "description": "Créer ou modifier les taxonomies et catégories d'actifs appartenant à l'utilisateur. Nécessite classification:read."
       },
       "activities_draft": {
         "label": "Activités — brouillon",

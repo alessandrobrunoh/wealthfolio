@@ -118,6 +118,39 @@ describe("PatCreateDialog scope dependencies", () => {
     expect(holdings).toHaveAttribute("aria-checked", "false");
     expect(holdings).not.toBeDisabled();
   });
+
+  it("derives domain read scopes from the matching write permissions", () => {
+    render(
+      <PatCreateDialog
+        open
+        onOpenChange={vi.fn()}
+        onCreate={vi.fn().mockResolvedValue("wfp_secret")}
+        isCreating={false}
+      />,
+    );
+
+    const accountsRead = scopeCheckbox("Accounts \\(read\\)");
+    const accountsWrite = scopeCheckbox("Accounts — create/edit");
+    const planningRead = scopeCheckbox("Financial planning \\(read\\)");
+    const planningWrite = scopeCheckbox("Financial planning — write");
+
+    fireEvent.click(accountsRead);
+    fireEvent.click(accountsWrite);
+    expect(accountsRead).toHaveAttribute("aria-checked", "true");
+    expect(accountsRead).toBeDisabled();
+
+    fireEvent.click(planningRead);
+    fireEvent.click(planningWrite);
+    expect(planningRead).toHaveAttribute("aria-checked", "true");
+    expect(planningRead).toBeDisabled();
+
+    fireEvent.click(accountsWrite);
+    fireEvent.click(planningWrite);
+    expect(accountsRead).toHaveAttribute("aria-checked", "false");
+    expect(accountsRead).not.toBeDisabled();
+    expect(planningRead).toHaveAttribute("aria-checked", "false");
+    expect(planningRead).not.toBeDisabled();
+  });
 });
 
 describe("PatCreateDialog client config", () => {

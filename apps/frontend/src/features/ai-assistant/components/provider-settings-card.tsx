@@ -53,6 +53,8 @@ interface ProviderSettingsCardProps {
   onDeleteApiKey: () => void;
   onRevealApiKey: () => Promise<string | null>;
   onCustomUrlChange?: (url: string) => void;
+  onEditCustomProvider?: () => void;
+  onDeleteCustomProvider?: () => void;
   /** @deprecated Use onSetFavoriteModels instead for multi-select */
   onSelectModel?: (modelId: string) => void;
   /** `capabilityOverride` is saved in the same update as the favorites. */
@@ -153,6 +155,8 @@ export function ProviderSettingsCard({
   onDeleteApiKey,
   onRevealApiKey,
   onCustomUrlChange,
+  onEditCustomProvider,
+  onDeleteCustomProvider,
   onSelectModel: _onSelectModel,
   onSetFavoriteModels,
   onSetCapabilityOverride,
@@ -393,6 +397,28 @@ export function ProviderSettingsCard({
 
           {/* Controls */}
           <div className="flex shrink-0 items-center gap-2">
+            {provider.isCustom && onEditCustomProvider && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground h-8 w-8"
+                aria-label={t("ai:providerSettings.customProvider.edit")}
+                onClick={onEditCustomProvider}
+              >
+                <Icons.Pencil className="h-4 w-4" />
+              </Button>
+            )}
+            {provider.isCustom && onDeleteCustomProvider && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-destructive h-8 w-8"
+                aria-label={t("ai:providerSettings.customProvider.delete")}
+                onClick={onDeleteCustomProvider}
+              >
+                <Icons.Trash2 className="h-4 w-4" />
+              </Button>
+            )}
             <CollapsibleTrigger
               render={
                 <Button

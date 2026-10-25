@@ -1,8 +1,10 @@
 //! AI provider service - merges catalog with user settings.
 
 use async_trait::async_trait;
+use reqwest::Url;
 use std::collections::HashSet;
 use std::sync::Arc;
+use uuid::Uuid;
 
 use wealthfolio_core::errors::{Result, ValidationError};
 use wealthfolio_core::secrets::SecretStore;
@@ -10,13 +12,18 @@ use wealthfolio_core::settings::SettingsRepositoryTrait;
 
 use crate::model_families::{former_catalog_capabilities, non_catalog_capabilities};
 use crate::provider_model::{
-    default_priority, AiProviderCatalog, AiProviderSettings, AiProvidersResponse, FetchedModel,
-    ListModelsResponse, MergedModel, MergedProvider, ModelCapabilities, ModelCapabilityOverrides,
-    ProviderApiError, ProviderConfig, ProviderTuning, ProviderUserSettings,
-    SetDefaultProviderRequest, UpdateProviderSettingsRequest, AI_PROVIDER_SETTINGS_KEY,
-    AI_PROVIDER_SETTINGS_SCHEMA_VERSION,
+    default_priority, AiProviderCatalog, AiProviderSettings, AiProvidersResponse, CatalogModel,
+    CatalogProvider, ConnectionField, CreateCustomProviderRequest, CustomProviderSettings,
+    FetchedModel, ListModelsResponse, MergedModel, MergedProvider, ModelCapabilities,
+    ModelCapabilityOverrides, ProviderApiError, ProviderConfig, ProviderDefaultConfig,
+    ProviderTuning, ProviderUserSettings, SetDefaultProviderRequest, UpdateCustomProviderRequest,
+    UpdateProviderSettingsRequest, AI_PROVIDER_SECRET_PREFIX, AI_PROVIDER_SETTINGS_KEY,
+    AI_PROVIDER_SETTINGS_SCHEMA_VERSION, CUSTOM_PROVIDER_ID_PREFIX,
 };
-use crate::provider_urls::openai_compatible_models_url;
+use crate::provider_urls::{
+    custom_openai_compatible_models_url, custom_provider_url_is_secure,
+    openai_compatible_models_url,
+};
 use crate::types::normalize_tools_allowlist;
 
 /// Service trait for AI provider operations.
@@ -30,6 +37,15 @@ pub trait AiProviderServiceTrait: Send + Sync {
 
     /// Set or clear the default provider.
     async fn set_default_provider(&self, request: SetDefaultProviderRequest) -> Result<()>;
+
+    /// Create a custom OpenAI Chat Completions provider and return its stable ID.
+    async fn create_custom_provider(&self, request: CreateCustomProviderRequest) -> Result<String>;
+
+    /// Update a custom provider's name, endpoint and model IDs.
+    async fn update_custom_provider(&self, request: UpdateCustomProviderRequest) -> Result<()>;
+
+    /// Remove a custom provider, its settings, and its stored API key.
+    async fn delete_custom_provider(&self, provider_id: &str) -> Result<()>;
 
     /// Get provider configuration for backend-only use (chat, model listing).
     /// This retrieves the API key from the secret store - never exposed to frontend.
@@ -62,6 +78,104 @@ pub struct AiProviderService {
     settings_repo: Arc<dyn SettingsRepositoryTrait>,
     secret_store: Arc<dyn SecretStore>,
     catalog: AiProviderCatalog,
+}
+
+fn validate_custom_provider_fields(
+    name: &str,
+    base_url: &str,
+    default_model: &str,
+    models: Vec<String>,
+) -> Result<(String, CustomProviderSettings)> {
+    let name = name.trim();
+    if name.is_empty() || name.len() > 100 {
+        return Err(wealthfolio_core::errors::Error::Validation(
+            ValidationError::InvalidInput(
+                "Provider name must contain between 1 and 100 characters".to_string(),
+            ),
+        ));
+    }
+    if base_url.trim().len() > 2048 {
+        return Err(wealthfolio_core::errors::Error::Validation(
+            ValidationError::InvalidInput("Provider base URL cannot exceed 2048 characters".into()),
+        ));
+    }
+
+    let parsed_url = Url::parse(base_url.trim()).map_err(|_| {
+        wealthfolio_core::errors::Error::Validation(ValidationError::InvalidInput(
+            "Provider base URL must be a valid HTTP or HTTPS URL".to_string(),
+        ))
+    })?;
+    if !custom_provider_url_is_secure(&parsed_url)
+        || parsed_url.host().is_none()
+        || !parsed_url.username().is_empty()
+        || parsed_url.password().is_some()
+        || parsed_url.query().is_some()
+        || parsed_url.fragment().is_some()
+    {
+        return Err(wealthfolio_core::errors::Error::Validation(
+            ValidationError::InvalidInput(
+                "Provider base URL must use HTTPS, or HTTP on a loopback host, and cannot include credentials, query parameters, or a fragment"
+                    .to_string(),
+            ),
+        ));
+    }
+
+    let default_model = default_model.trim();
+    if default_model.is_empty() || default_model.len() > 200 {
+        return Err(wealthfolio_core::errors::Error::Validation(
+            ValidationError::InvalidInput(
+                "Default model ID must contain between 1 and 200 characters".to_string(),
+            ),
+        ));
+    }
+
+    let mut model_ids = Vec::new();
+    let mut seen = HashSet::new();
+    for model in models.into_iter().map(|model| model.trim().to_string()) {
+        if model.is_empty() || model.len() > 200 || model.chars().any(char::is_control) {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput(
+                    "Model IDs must contain between 1 and 200 printable characters".to_string(),
+                ),
+            ));
+        }
+        if seen.insert(model.clone()) {
+            model_ids.push(model);
+        }
+        if model_ids.len() > 50 {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput(
+                    "A custom provider can contain at most 50 model IDs".to_string(),
+                ),
+            ));
+        }
+    }
+    if seen.insert(default_model.to_string()) {
+        if model_ids.len() >= 50 {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput(
+                    "A custom provider can contain at most 50 model IDs".to_string(),
+                ),
+            ));
+        }
+        model_ids.push(default_model.to_string());
+    }
+
+    Ok((
+        parsed_url.as_str().trim_end_matches('/').to_string(),
+        CustomProviderSettings {
+            name: name.to_string(),
+            default_model: default_model.to_string(),
+            models: model_ids,
+        },
+    ))
+}
+
+fn redact_provider_key(message: String, api_key: Option<&str>) -> String {
+    match api_key.filter(|key| !key.is_empty()) {
+        Some(api_key) if message.contains(api_key) => message.replace(api_key, "[redacted]"),
+        _ => message,
+    }
 }
 
 impl AiProviderService {
@@ -206,12 +320,69 @@ impl AiProviderService {
 impl AiProviderServiceTrait for AiProviderService {
     fn get_ai_providers(&self) -> Result<AiProvidersResponse> {
         let user_settings = self.load_user_settings();
+        let mut catalog_providers = self.catalog.providers.clone();
+        let mut custom_provider_ids = HashSet::new();
+        for (id, custom) in &user_settings.custom_providers {
+            if !id.starts_with(CUSTOM_PROVIDER_ID_PREFIX) || catalog_providers.contains_key(id) {
+                continue;
+            }
+            let models = custom
+                .models
+                .iter()
+                .map(|model_id| {
+                    (
+                        model_id.clone(),
+                        CatalogModel {
+                            capabilities: non_catalog_capabilities(id, model_id, false),
+                        },
+                    )
+                })
+                .collect();
+            catalog_providers.insert(
+                id.clone(),
+                CatalogProvider {
+                    name: custom.name.clone(),
+                    provider_type: "api".to_string(),
+                    icon: "LogoOpenAI".to_string(),
+                    description: "Custom OpenAI-compatible Chat Completions endpoint".to_string(),
+                    env_key: "CUSTOM_API_KEY".to_string(),
+                    default_config: ProviderDefaultConfig {
+                        enabled: true,
+                        priority: default_priority(),
+                        url: None,
+                    },
+                    connection_fields: vec![
+                        ConnectionField {
+                            key: "apiKey".to_string(),
+                            label: "API Key".to_string(),
+                            field_type: "password".to_string(),
+                            placeholder: "Enter your API key".to_string(),
+                            required: true,
+                            help_url: None,
+                        },
+                        ConnectionField {
+                            key: "baseUrl".to_string(),
+                            label: "Base URL".to_string(),
+                            field_type: "text".to_string(),
+                            placeholder: "https://api.example.com/v1".to_string(),
+                            required: true,
+                            help_url: None,
+                        },
+                    ],
+                    models,
+                    default_model: custom.default_model.clone(),
+                    title_model_id: Some(custom.default_model.clone()),
+                    documentation_url: String::new(),
+                    tuning: None,
+                },
+            );
+            custom_provider_ids.insert(id.clone());
+        }
 
-        let mut providers: Vec<MergedProvider> = self
-            .catalog
-            .providers
+        let mut providers: Vec<MergedProvider> = catalog_providers
             .iter()
             .map(|(id, catalog_provider)| {
+                let is_custom = custom_provider_ids.contains(id);
                 // Get user settings for this provider, or use defaults
                 let user = user_settings.providers.get(id).cloned().unwrap_or_else(|| {
                     // Use catalog defaults for providers not in user settings
@@ -240,9 +411,9 @@ impl AiProviderServiceTrait for AiProviderService {
                         };
                         MergedModel {
                             id: model_id.clone(),
-                            name: None, // Catalog models don't have separate display names
+                            name: is_custom.then(|| model_id.clone()),
                             capabilities,
-                            is_catalog: true,
+                            is_catalog: !is_custom,
                             is_favorite: user.favorite_models.contains(model_id),
                             has_capability_overrides: has_overrides,
                         }
@@ -311,6 +482,7 @@ impl AiProviderServiceTrait for AiProviderService {
                 MergedProvider {
                     id: id.clone(),
                     name: catalog_provider.name.clone(),
+                    is_custom,
                     provider_type: catalog_provider.provider_type.clone(),
                     icon: catalog_provider.icon.clone(),
                     description: catalog_provider.description.clone(),
@@ -353,14 +525,15 @@ impl AiProviderServiceTrait for AiProviderService {
     }
 
     async fn update_provider_settings(&self, request: UpdateProviderSettingsRequest) -> Result<()> {
-        // Verify provider exists in catalog
-        if !self.catalog.providers.contains_key(&request.provider_id) {
+        let mut settings = self.load_user_settings();
+        // Built-in and user-defined providers are both valid settings targets.
+        if !self.catalog.providers.contains_key(&request.provider_id)
+            && !settings.custom_providers.contains_key(&request.provider_id)
+        {
             return Err(wealthfolio_core::errors::Error::Validation(
                 ValidationError::InvalidInput(format!("Unknown provider: {}", request.provider_id)),
             ));
         }
-
-        let mut settings = self.load_user_settings();
 
         // Get or create provider settings
         let provider_settings = settings
@@ -444,17 +617,124 @@ impl AiProviderServiceTrait for AiProviderService {
         self.save_user_settings(&settings).await
     }
 
+    async fn create_custom_provider(&self, request: CreateCustomProviderRequest) -> Result<String> {
+        let (base_url, custom_provider) = validate_custom_provider_fields(
+            &request.name,
+            &request.base_url,
+            &request.default_model,
+            request.models,
+        )?;
+        let mut settings = self.load_user_settings();
+        if settings.custom_providers.len() >= 50 {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput(
+                    "At most 50 custom providers can be configured".to_string(),
+                ),
+            ));
+        }
+        let provider_id = format!("{}{}", CUSTOM_PROVIDER_ID_PREFIX, Uuid::now_v7().simple());
+        let default_model = custom_provider.default_model.clone();
+        settings
+            .custom_providers
+            .insert(provider_id.clone(), custom_provider);
+        settings.providers.insert(
+            provider_id.clone(),
+            ProviderUserSettings {
+                enabled: true,
+                selected_model: Some(default_model.clone()),
+                custom_url: Some(base_url),
+                priority: default_priority(),
+                favorite_models: vec![default_model],
+                ..Default::default()
+            },
+        );
+        settings.schema_version = AI_PROVIDER_SETTINGS_SCHEMA_VERSION;
+        self.save_user_settings(&settings).await?;
+        Ok(provider_id)
+    }
+
+    async fn update_custom_provider(&self, request: UpdateCustomProviderRequest) -> Result<()> {
+        if !request.provider_id.starts_with(CUSTOM_PROVIDER_ID_PREFIX) {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput("Unknown custom provider".to_string()),
+            ));
+        }
+        let (base_url, custom_provider) = validate_custom_provider_fields(
+            &request.name,
+            &request.base_url,
+            &request.default_model,
+            request.models,
+        )?;
+        let mut settings = self.load_user_settings();
+        if !settings.custom_providers.contains_key(&request.provider_id) {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput("Unknown custom provider".to_string()),
+            ));
+        }
+
+        let allowed_models: HashSet<_> = custom_provider.models.iter().cloned().collect();
+        let default_model = custom_provider.default_model.clone();
+        settings
+            .custom_providers
+            .insert(request.provider_id.clone(), custom_provider);
+        let provider_settings = settings.providers.entry(request.provider_id).or_default();
+        provider_settings.custom_url = Some(base_url);
+        if provider_settings
+            .selected_model
+            .as_ref()
+            .is_none_or(|model| !allowed_models.contains(model))
+        {
+            provider_settings.selected_model = Some(default_model);
+        }
+        provider_settings
+            .favorite_models
+            .retain(|model| allowed_models.contains(model));
+        provider_settings
+            .model_capability_overrides
+            .retain(|model, _| allowed_models.contains(model));
+        settings.schema_version = AI_PROVIDER_SETTINGS_SCHEMA_VERSION;
+        self.save_user_settings(&settings).await
+    }
+
+    async fn delete_custom_provider(&self, provider_id: &str) -> Result<()> {
+        if !provider_id.starts_with(CUSTOM_PROVIDER_ID_PREFIX) {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput("Unknown custom provider".to_string()),
+            ));
+        }
+        let mut settings = self.load_user_settings();
+        if !settings.custom_providers.contains_key(provider_id) {
+            return Err(wealthfolio_core::errors::Error::Validation(
+                ValidationError::InvalidInput("Unknown custom provider".to_string()),
+            ));
+        }
+
+        // Delete the credential first. If saving settings then fails, the
+        // provider remains visible but can be reconfigured with a new key.
+        self.secret_store
+            .delete_secret(&format!("{}{}", AI_PROVIDER_SECRET_PREFIX, provider_id))?;
+        settings.custom_providers.remove(provider_id);
+        settings.providers.remove(provider_id);
+        if settings.default_provider.as_deref() == Some(provider_id) {
+            settings.default_provider = None;
+        }
+        settings.schema_version = AI_PROVIDER_SETTINGS_SCHEMA_VERSION;
+        self.save_user_settings(&settings).await
+    }
+
     async fn set_default_provider(&self, request: SetDefaultProviderRequest) -> Result<()> {
+        let mut settings = self.load_user_settings();
         // Verify provider exists if setting a default
         if let Some(ref provider_id) = request.provider_id {
-            if !self.catalog.providers.contains_key(provider_id) {
+            if !self.catalog.providers.contains_key(provider_id)
+                && !settings.custom_providers.contains_key(provider_id)
+            {
                 return Err(wealthfolio_core::errors::Error::Validation(
                     ValidationError::InvalidInput(format!("Unknown provider: {}", provider_id)),
                 ));
             }
         }
 
-        let mut settings = self.load_user_settings();
         settings.default_provider = request.provider_id;
         settings.schema_version = AI_PROVIDER_SETTINGS_SCHEMA_VERSION;
 
@@ -465,14 +745,19 @@ impl AiProviderServiceTrait for AiProviderService {
         &self,
         provider_id: &str,
     ) -> std::result::Result<ProviderConfig, ProviderApiError> {
-        // Verify provider exists in catalog
-        if !self.catalog.providers.contains_key(provider_id) {
+        let custom_provider = self
+            .load_user_settings()
+            .custom_providers
+            .contains_key(provider_id);
+        // Verify the provider exists in either the built-in catalog or the
+        // user's custom provider settings.
+        if !self.catalog.providers.contains_key(provider_id) && !custom_provider {
             return Err(ProviderApiError::UnknownProvider {
                 provider_id: provider_id.to_string(),
             });
         }
 
-        let requires_api_key = self.provider_requires_api_key(provider_id);
+        let requires_api_key = custom_provider || self.provider_requires_api_key(provider_id);
         let api_key = self.get_api_key(provider_id);
         let base_url = self.get_custom_url(provider_id);
 
@@ -480,6 +765,16 @@ impl AiProviderServiceTrait for AiProviderService {
         if requires_api_key && api_key.is_none() {
             return Err(ProviderApiError::MissingApiKey {
                 provider_id: provider_id.to_string(),
+            });
+        }
+        if custom_provider
+            && base_url
+                .as_deref()
+                .and_then(|url| Url::parse(url).ok())
+                .is_none_or(|url| !custom_provider_url_is_secure(&url))
+        {
+            return Err(ProviderApiError::InvalidInput {
+                message: "Custom provider base URL is missing, invalid, or not secure".to_string(),
             });
         }
 
@@ -527,6 +822,10 @@ impl AiProviderServiceTrait for AiProviderService {
     ) -> std::result::Result<ListModelsResponse, ProviderApiError> {
         // Get provider config (validates provider exists and has API key if needed)
         let config = self.get_provider_config(provider_id)?;
+        let is_custom_provider = self
+            .load_user_settings()
+            .custom_providers
+            .contains_key(provider_id);
 
         // Build the model list URL based on provider
         let base_url = config.base_url.as_deref().unwrap_or(match provider_id {
@@ -539,11 +838,15 @@ impl AiProviderServiceTrait for AiProviderService {
             _ => "https://api.openai.com",
         });
 
-        let models_url = match provider_id {
-            "ollama" => format!("{}/api/tags", base_url.trim_end_matches('/')),
-            "google" => format!("{}/v1beta/models", base_url.trim_end_matches('/')),
-            // OpenAI-compatible: OpenAI, Groq, OpenRouter.
-            _ => openai_compatible_models_url(base_url),
+        let models_url = if is_custom_provider {
+            custom_openai_compatible_models_url(base_url)
+        } else {
+            match provider_id {
+                "ollama" => format!("{}/api/tags", base_url.trim_end_matches('/')),
+                "google" => format!("{}/v1beta/models", base_url.trim_end_matches('/')),
+                // OpenAI-compatible: OpenAI, Groq, OpenRouter.
+                _ => openai_compatible_models_url(base_url),
+            }
         };
 
         // Build HTTP client and request
@@ -571,7 +874,10 @@ impl AiProviderServiceTrait for AiProviderService {
 
         if !response.status().is_success() {
             let status = response.status();
-            let body = response.text().await.unwrap_or_default();
+            let body = redact_provider_key(
+                response.text().await.unwrap_or_default(),
+                config.api_key.as_deref(),
+            );
             return Err(ProviderApiError::ProviderError {
                 message: format!("Provider returned error {}: {}", status, body),
             });
@@ -800,7 +1106,9 @@ fn parse_fetched_models(
                     // The list carries no capability metadata; only OpenAI's
                     // own models, and the ones the catalog used to list, have
                     // useful defaults.
-                    let capabilities = if provider_id == "openai" {
+                    let capabilities = if provider_id == "openai"
+                        || provider_id.starts_with(CUSTOM_PROVIDER_ID_PREFIX)
+                    {
                         Some(non_catalog_capabilities(provider_id, &m.id, false))
                     } else {
                         former_catalog_capabilities(provider_id, &m.id)
@@ -821,6 +1129,41 @@ fn parse_fetched_models(
 mod tests {
     use super::*;
     use serde_json::json;
+    use std::collections::HashMap;
+    use std::sync::{Arc, RwLock};
+
+    #[derive(Default)]
+    struct MutableSettings(RwLock<HashMap<String, String>>);
+
+    #[async_trait]
+    impl SettingsRepositoryTrait for MutableSettings {
+        fn get_settings(&self) -> Result<wealthfolio_core::settings::Settings> {
+            Ok(Default::default())
+        }
+
+        async fn update_settings(
+            &self,
+            _: &wealthfolio_core::settings::SettingsUpdate,
+        ) -> Result<()> {
+            Ok(())
+        }
+
+        fn get_setting(&self, key: &str) -> Result<String> {
+            Ok(self.0.read().unwrap().get(key).cloned().unwrap_or_default())
+        }
+
+        async fn update_setting(&self, key: &str, value: &str) -> Result<()> {
+            self.0
+                .write()
+                .unwrap()
+                .insert(key.to_string(), value.to_string());
+            Ok(())
+        }
+
+        fn get_distinct_currencies_excluding_base(&self, _: &str) -> Result<Vec<String>> {
+            Ok(Vec::new())
+        }
+    }
 
     fn caps(models: &[FetchedModel], id: &str) -> Option<(bool, bool, bool)> {
         let model = models.iter().find(|m| m.id == id).expect(id);
@@ -935,6 +1278,204 @@ mod tests {
 
         let groq = parse_fetched_models("groq", &body).unwrap();
         assert_eq!(caps(&groq, "gpt-6-astra"), None);
+
+        let custom = parse_fetched_models(
+            &format!("{CUSTOM_PROVIDER_ID_PREFIX}fixture"),
+            r#"{"data":[{"id":"glm-5.3"}]}"#,
+        )
+        .unwrap();
+        assert_eq!(caps(&custom, "glm-5.3"), Some((true, false, false)));
+    }
+
+    #[tokio::test]
+    async fn custom_provider_profile_lifecycle_keeps_secret_out_of_settings() {
+        use crate::env::test_env::MockSecretStore;
+        use wealthfolio_core::secrets::SecretStore;
+
+        let settings = Arc::new(MutableSettings::default());
+        let secrets = Arc::new(MockSecretStore::default());
+        let service = AiProviderService::new(
+            settings.clone(),
+            secrets.clone(),
+            include_str!("ai_providers.json"),
+        )
+        .unwrap();
+
+        let provider_id = service
+            .create_custom_provider(CreateCustomProviderRequest {
+                name: "Z.AI".to_string(),
+                base_url: "https://api.z.ai/api/paas/v4/".to_string(),
+                default_model: "glm-5.3".to_string(),
+                models: vec!["glm-4.6".to_string(), "glm-5.3".to_string()],
+            })
+            .await
+            .unwrap();
+
+        assert!(provider_id.starts_with(CUSTOM_PROVIDER_ID_PREFIX));
+        let response = service.get_ai_providers().unwrap();
+        let provider = response
+            .providers
+            .iter()
+            .find(|provider| provider.id == provider_id)
+            .unwrap();
+        assert!(provider.is_custom);
+        assert_eq!(provider.name, "Z.AI");
+        assert_eq!(
+            provider.custom_url.as_deref(),
+            Some("https://api.z.ai/api/paas/v4")
+        );
+        assert_eq!(provider.default_model, "glm-5.3");
+        assert!(!provider.has_api_key);
+        assert!(provider.models.iter().any(|model| {
+            model.id == "glm-5.3" && !model.is_catalog && model.capabilities.tools
+        }));
+
+        secrets
+            .set_secret(
+                &format!("{}{}", AI_PROVIDER_SECRET_PREFIX, provider_id),
+                "fixture-secret",
+            )
+            .unwrap();
+        service
+            .set_default_provider(SetDefaultProviderRequest {
+                provider_id: Some(provider_id.clone()),
+            })
+            .await
+            .unwrap();
+        service
+            .update_custom_provider(UpdateCustomProviderRequest {
+                provider_id: provider_id.clone(),
+                name: "Z.AI GLM".to_string(),
+                base_url: "https://api.z.ai/api/paas/v4".to_string(),
+                default_model: "glm-5.3-flash".to_string(),
+                models: vec!["glm-5.3-flash".to_string()],
+            })
+            .await
+            .unwrap();
+        assert_eq!(
+            service
+                .get_ai_providers()
+                .unwrap()
+                .providers
+                .iter()
+                .find(|provider| provider.id == provider_id)
+                .unwrap()
+                .name,
+            "Z.AI GLM"
+        );
+
+        service.delete_custom_provider(&provider_id).await.unwrap();
+        let response = service.get_ai_providers().unwrap();
+        assert!(!response
+            .providers
+            .iter()
+            .any(|provider| provider.id == provider_id));
+        assert_eq!(response.default_provider, None);
+        assert_eq!(
+            secrets
+                .get_secret(&format!("{}{}", AI_PROVIDER_SECRET_PREFIX, provider_id))
+                .unwrap(),
+            None
+        );
+
+        let serialized = settings.get_setting(AI_PROVIDER_SETTINGS_KEY).unwrap();
+        assert!(!serialized.contains("fixture-secret"));
+    }
+
+    #[tokio::test]
+    async fn custom_model_listing_uses_the_exact_api_path_and_stored_bearer_key() {
+        use crate::env::test_env::MockSecretStore;
+        use tokio::{
+            io::{AsyncReadExt, AsyncWriteExt},
+            net::TcpListener,
+        };
+        use wealthfolio_core::secrets::SecretStore;
+
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            let (mut socket, _) = listener.accept().await.unwrap();
+            let mut request = Vec::new();
+            loop {
+                let mut chunk = [0; 1024];
+                let read = socket.read(&mut chunk).await.unwrap();
+                assert_ne!(read, 0);
+                request.extend_from_slice(&chunk[..read]);
+                if request.windows(4).any(|window| window == b"\r\n\r\n") {
+                    break;
+                }
+            }
+            let request = String::from_utf8(request).unwrap();
+            let body = r#"{"data":[{"id":"glm-5.3"}]}"#;
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+            socket.write_all(response.as_bytes()).await.unwrap();
+            request
+        });
+
+        let settings = Arc::new(MutableSettings::default());
+        let secrets = Arc::new(MockSecretStore::default());
+        let service =
+            AiProviderService::new(settings, secrets.clone(), include_str!("ai_providers.json"))
+                .unwrap();
+        let provider_id = service
+            .create_custom_provider(CreateCustomProviderRequest {
+                name: "Z.AI".to_string(),
+                base_url: format!("http://{address}/api/paas/v4"),
+                default_model: "glm-5.3".to_string(),
+                models: Vec::new(),
+            })
+            .await
+            .unwrap();
+        secrets
+            .set_secret(
+                &format!("{}{}", AI_PROVIDER_SECRET_PREFIX, provider_id),
+                "fixture-key",
+            )
+            .unwrap();
+
+        let response = service.list_models(&provider_id).await.unwrap();
+        assert!(response.supports_listing);
+        assert_eq!(response.models.len(), 1);
+        assert_eq!(response.models[0].id, "glm-5.3");
+
+        let request = server.await.unwrap();
+        let request_lower = request.to_ascii_lowercase();
+        assert!(request.starts_with("GET /api/paas/v4/models "), "{request}");
+        assert!(
+            request_lower.contains("authorization: bearer fixture-key"),
+            "{request}"
+        );
+    }
+
+    #[test]
+    fn custom_provider_validation_rejects_unsafe_or_unusable_urls() {
+        for url in [
+            "file:///tmp/ai",
+            "http://provider.example/v1",
+            "https://user:password@provider.example/v1",
+            "https://provider.example/v1?token=secret",
+            "https://provider.example/v1#fragment",
+        ] {
+            assert!(
+                validate_custom_provider_fields("Custom", url, "model", Vec::new(),).is_err(),
+                "URL should be rejected: {url}"
+            );
+        }
+    }
+
+    #[test]
+    fn provider_model_list_errors_do_not_echo_the_api_key() {
+        assert_eq!(
+            redact_provider_key(
+                "bad request for secret-token".to_string(),
+                Some("secret-token"),
+            ),
+            "bad request for [redacted]"
+        );
     }
 
     struct StoredSettings(String);

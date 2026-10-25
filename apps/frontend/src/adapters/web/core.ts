@@ -363,6 +363,9 @@ export const COMMANDS: CommandMap = {
   // AI Providers
   get_ai_providers: { method: "GET", path: "/ai/providers" },
   update_ai_provider_settings: { method: "PUT", path: "/ai/providers/settings" },
+  create_custom_ai_provider: { method: "POST", path: "/ai/providers/custom" },
+  update_custom_ai_provider: { method: "PUT", path: "/ai/providers/custom" },
+  delete_custom_ai_provider: { method: "DELETE", path: "/ai/providers/custom" },
   set_default_ai_provider: { method: "POST", path: "/ai/providers/default" },
   list_ai_models: { method: "GET", path: "/ai/providers" },
   // AI Threads
@@ -2026,6 +2029,17 @@ export const invoke = async <T>(command: string, payload?: Record<string, unknow
     case "update_ai_provider_settings": {
       const { request } = payload as { request: Record<string, unknown> };
       body = JSON.stringify(request);
+      break;
+    }
+    case "create_custom_ai_provider":
+    case "update_custom_ai_provider": {
+      const { request } = payload as { request: Record<string, unknown> };
+      body = JSON.stringify(request);
+      break;
+    }
+    case "delete_custom_ai_provider": {
+      const { providerId } = payload as { providerId: string };
+      url += `/${encodeURIComponent(providerId)}`;
       break;
     }
     case "set_default_ai_provider": {

@@ -607,6 +607,28 @@
       "repetitionBlurb": "抑制模型自我重复。",
       "otherTitle": "其他",
       "otherBlurb": "杂项提供商特定选项。"
+    },
+    "customProvider": {
+      "add": "添加自定义提供商",
+      "createTitle": "添加自定义提供商",
+      "editTitle": "编辑自定义提供商",
+      "description": "连接兼容 OpenAI Chat Completions 的端点。",
+      "name": "提供商名称",
+      "baseUrl": "基础 URL",
+      "baseUrlHint": "远程端点请使用 HTTPS；HTTP 仅允许用于 localhost。输入不带 /chat/completions 后缀的 API 基础路径。",
+      "defaultModel": "默认模型 ID",
+      "models": "可用模型 ID",
+      "modelsHint": "每行输入一个模型 ID，也可以用逗号分隔。",
+      "create": "创建提供商",
+      "edit": "编辑自定义提供商",
+      "delete": "删除自定义提供商",
+      "deleteTitle": "删除此自定义提供商？",
+      "deleteDescription": "将删除提供商设置和已保存的 API 密钥，但不会删除现有对话。",
+      "created": "已添加自定义提供商",
+      "updated": "已更新自定义提供商",
+      "deleted": "已删除自定义提供商",
+      "saveFailed": "无法保存自定义提供商",
+      "deleteFailed": "无法删除自定义提供商"
     }
   }
 }

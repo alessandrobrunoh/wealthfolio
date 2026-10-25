@@ -15,7 +15,7 @@ use crate::error::AiError;
 use crate::model_families::non_catalog_capabilities;
 use crate::provider_model::{
     AiProviderSettings, CapabilityInfo, ConnectionField, ModelCapabilities, ProviderDefaultConfig,
-    ProviderTuning, AI_PROVIDER_SETTINGS_KEY,
+    ProviderTuning, AI_PROVIDER_SECRET_PREFIX, AI_PROVIDER_SETTINGS_KEY, CUSTOM_PROVIDER_ID_PREFIX,
 };
 use crate::types::normalize_tools_allowlist;
 
@@ -198,25 +198,49 @@ impl<E: AiEnvironment> ProviderService<E> {
             .map_err(|e| AiError::Internal(e.to_string()))?
             .and_then(|s| serde_json::from_str(&s).ok())
             .unwrap_or_default();
+        let provider_settings: AiProviderSettings = self
+            .env
+            .settings_service()
+            .get_setting_value(AI_PROVIDER_SETTINGS_KEY)
+            .ok()
+            .flatten()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_default();
 
         // Get current provider and model
-        let provider_id = stored
-            .provider_id
+        let provider_id = provider_settings
+            .default_provider
             .clone()
+            .or_else(|| stored.provider_id.clone())
             .unwrap_or_else(|| "ollama".to_string());
-        let model = stored.model.clone().unwrap_or_else(|| {
-            PROVIDER_CATALOG
-                .providers
-                .get(&provider_id)
-                .map(|p| p.default_model.clone())
-                .unwrap_or_else(|| "deepseek-r1:8b".to_string())
-        });
+        let model = provider_settings
+            .providers
+            .get(&provider_id)
+            .and_then(|provider| provider.selected_model.clone())
+            .or_else(|| {
+                provider_settings
+                    .custom_providers
+                    .get(&provider_id)
+                    .map(|provider| provider.default_model.clone())
+            })
+            .or_else(|| {
+                (stored.provider_id.as_deref() == Some(provider_id.as_str()))
+                    .then(|| stored.model.clone())
+                    .flatten()
+            })
+            .unwrap_or_else(|| {
+                PROVIDER_CATALOG
+                    .providers
+                    .get(&provider_id)
+                    .map(|p| p.default_model.clone())
+                    .unwrap_or_else(|| "deepseek-r1:8b".to_string())
+            });
 
         // Check if we have an API key
         let has_api_key = self.has_api_key(&provider_id);
 
         // Build provider settings
-        let providers: Vec<SimpleProviderSetting> = PROVIDER_CATALOG
+        let mut providers: Vec<SimpleProviderSetting> = PROVIDER_CATALOG
             .providers
             .iter()
             .map(|(id, entry)| {
@@ -251,6 +275,35 @@ impl<E: AiEnvironment> ProviderService<E> {
                 }
             })
             .collect();
+        for (id, custom) in &provider_settings.custom_providers {
+            if !id.starts_with(CUSTOM_PROVIDER_ID_PREFIX)
+                || PROVIDER_CATALOG.providers.contains_key(id)
+            {
+                continue;
+            }
+            let user = provider_settings.providers.get(id);
+            providers.push(SimpleProviderSetting {
+                id: id.clone(),
+                name: custom.name.clone(),
+                description: "Custom OpenAI-compatible Chat Completions endpoint".to_string(),
+                provider_type: "api".to_string(),
+                icon: "LogoOpenAI".to_string(),
+                default_model: custom.default_model.clone(),
+                enabled: user.map(|settings| settings.enabled).unwrap_or(true),
+                supports_custom_url: true,
+                url: user.and_then(|settings| settings.custom_url.clone()),
+                documentation_url: None,
+                env_key: None,
+                models: custom
+                    .models
+                    .iter()
+                    .map(|model_id| SimpleModelInfo {
+                        id: model_id.clone(),
+                        capabilities: non_catalog_capabilities(id, model_id, false),
+                    })
+                    .collect(),
+            });
+        }
 
         Ok(SimpleSettings {
             provider_id,
@@ -264,7 +317,7 @@ impl<E: AiEnvironment> ProviderService<E> {
     /// Build the secret key for a provider (format: ai_<provider_id>).
     /// Matches the frontend convention in use-ai-providers.ts.
     fn secret_key_for_provider(provider_id: &str) -> String {
-        format!("ai_{}", provider_id)
+        format!("{}{}", AI_PROVIDER_SECRET_PREFIX, provider_id)
     }
 
     /// Get API key for a provider from the secret store.
@@ -351,11 +404,48 @@ impl<E: AiEnvironment> ProviderService<E> {
     /// Get the title model ID for a provider.
     /// Returns title_model_id if configured, otherwise falls back to default_model.
     pub fn get_title_model(&self, provider_id: &str) -> Option<String> {
-        PROVIDER_CATALOG.providers.get(provider_id).map(|p| {
-            p.title_model_id
-                .clone()
-                .unwrap_or_else(|| p.default_model.clone())
-        })
+        if let Some(provider) = PROVIDER_CATALOG.providers.get(provider_id) {
+            return Some(
+                provider
+                    .title_model_id
+                    .clone()
+                    .unwrap_or_else(|| provider.default_model.clone()),
+            );
+        }
+
+        self.load_custom_provider(provider_id)
+            .map(|provider| provider.default_model)
+    }
+
+    /// Whether a provider ID comes from the built-in catalog or a stored
+    /// custom profile. The `gemini` alias shares Google's provider settings.
+    pub fn is_supported_provider(&self, provider_id: &str) -> bool {
+        PROVIDER_CATALOG.providers.contains_key(provider_id)
+            || provider_id == "gemini"
+            || self.is_custom_provider(provider_id)
+    }
+
+    /// Whether `provider_id` identifies a stored custom Chat Completions
+    /// provider. The prefix alone is not sufficient: the profile must exist.
+    pub fn is_custom_provider(&self, provider_id: &str) -> bool {
+        self.load_custom_provider(provider_id).is_some()
+    }
+
+    fn load_custom_provider(
+        &self,
+        provider_id: &str,
+    ) -> Option<crate::provider_model::CustomProviderSettings> {
+        if !provider_id.starts_with(CUSTOM_PROVIDER_ID_PREFIX) {
+            return None;
+        }
+
+        self.env
+            .settings_service()
+            .get_setting_value(AI_PROVIDER_SETTINGS_KEY)
+            .ok()
+            .flatten()
+            .and_then(|value| serde_json::from_str::<AiProviderSettings>(&value).ok())
+            .and_then(|settings| settings.custom_providers.get(provider_id).cloned())
     }
 
     /// Get the tools allowlist for a provider.
@@ -543,6 +633,53 @@ mod tests {
             )])),
         });
         Arc::new(env)
+    }
+
+    #[test]
+    fn custom_profiles_supply_chat_url_title_model_and_provider_validation() {
+        use crate::env::test_env::{MockEnvironment, MockSettingsService};
+
+        let provider_id = format!("{CUSTOM_PROVIDER_ID_PREFIX}fixture");
+        let settings = serde_json::json!({
+            "schemaVersion": 3,
+            "defaultProvider": provider_id,
+            "customProviders": {
+                (provider_id.clone()): {
+                    "name": "Z.AI",
+                    "defaultModel": "glm-5.3",
+                    "models": ["glm-5.3"]
+                }
+            },
+            "providers": {
+                (provider_id.clone()): {
+                    "enabled": true,
+                    "customUrl": "https://api.z.ai/api/paas/v4"
+                }
+            }
+        });
+        let mut env = MockEnvironment::new();
+        env.settings_service = Arc::new(MockSettingsService {
+            settings: std::sync::RwLock::new(HashMap::from([(
+                AI_PROVIDER_SETTINGS_KEY.to_string(),
+                settings.to_string(),
+            )])),
+        });
+        let service = ProviderService::new(Arc::new(env));
+
+        assert!(service.is_supported_provider(&provider_id));
+        assert!(service.is_custom_provider(&provider_id));
+        assert_eq!(
+            service.get_title_model(&provider_id).as_deref(),
+            Some("glm-5.3")
+        );
+        assert_eq!(
+            service.get_provider_url(&provider_id).as_deref(),
+            Some("https://api.z.ai/api/paas/v4")
+        );
+        let settings = service.get_settings().unwrap();
+        assert_eq!(settings.provider_id, provider_id);
+        assert_eq!(settings.model, "glm-5.3");
+        assert!(!service.is_supported_provider("custom_openai_unknown"));
     }
 
     #[test]

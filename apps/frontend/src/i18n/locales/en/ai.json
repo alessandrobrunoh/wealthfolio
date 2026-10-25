@@ -625,6 +625,28 @@
       "repetitionBlurb": "Discourage the model from repeating itself.",
       "otherTitle": "Other",
       "otherBlurb": "Miscellaneous provider-specific options."
+    },
+    "customProvider": {
+      "add": "Add custom provider",
+      "createTitle": "Add a custom provider",
+      "editTitle": "Edit custom provider",
+      "description": "Connect an OpenAI-compatible Chat Completions endpoint.",
+      "name": "Provider name",
+      "baseUrl": "Base URL",
+      "baseUrlHint": "Use HTTPS for remote endpoints; HTTP is allowed only for localhost. Enter the API base path without the /chat/completions suffix.",
+      "defaultModel": "Default model ID",
+      "models": "Available model IDs",
+      "modelsHint": "Enter one model ID per line or separated by commas.",
+      "create": "Create provider",
+      "edit": "Edit custom provider",
+      "delete": "Delete custom provider",
+      "deleteTitle": "Delete this custom provider?",
+      "deleteDescription": "This removes the provider settings and stored API key. Existing conversations are not deleted.",
+      "created": "Custom provider added",
+      "updated": "Custom provider updated",
+      "deleted": "Custom provider deleted",
+      "saveFailed": "Could not save custom provider",
+      "deleteFailed": "Could not delete custom provider"
     }
   }
 }

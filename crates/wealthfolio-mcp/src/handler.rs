@@ -223,26 +223,28 @@ impl ServerHandler for WealthfolioMcpHandler {
             }
             Err(err @ AgentToolError::ScopeDenied { .. }) => {
                 let message = err.to_string();
+                let audit_message = tool.sanitize_error_for_audit(&err);
                 self.audit(Self::audit_entry(
                     &auth,
                     session_id,
                     name,
                     args_summary,
                     AuditOutcome::Denied,
-                    Some(message.clone()),
+                    Some(audit_message),
                 ))
                 .await;
                 Ok(CallToolResult::error(vec![ContentBlock::text(message)]))
             }
             Err(err) => {
                 let message = err.to_string();
+                let audit_message = tool.sanitize_error_for_audit(&err);
                 self.audit(Self::audit_entry(
                     &auth,
                     session_id,
                     name,
                     args_summary,
                     AuditOutcome::Error,
-                    Some(message.clone()),
+                    Some(audit_message),
                 ))
                 .await;
                 Ok(CallToolResult::error(vec![ContentBlock::text(message)]))
@@ -259,7 +261,16 @@ mod tests {
     /// removes existing data: creating or importing activities can rewrite an
     /// asset's quote mode and that day's manual quote, and linking transfers
     /// rewrites both legs.
-    const ADDITIVE_TOOLS: &[&str] = &["commit_categorization_rule"];
+    const ADDITIVE_TOOLS: &[&str] = &[
+        "commit_categorization_rule",
+        "create_account",
+        "create_category",
+        "create_contribution_limit",
+        "create_goal",
+        "create_manual_asset",
+        "create_portfolio",
+        "create_taxonomy",
+    ];
 
     #[test]
     fn mcp_catalog_labels_each_tool_read_only_or_write() {

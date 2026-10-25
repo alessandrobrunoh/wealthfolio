@@ -294,10 +294,26 @@ async fn mcp_pat_lifecycle() {
     .await;
     assert_eq!(status, 400);
 
+    for (name, scopes) in [
+        ("account write only", vec!["accounts:write"]),
+        ("holdings write only", vec!["holdings:write"]),
+        ("portfolio write only", vec!["portfolios:write"]),
+        ("planning write only", vec!["financial-planning:write"]),
+        ("taxonomy write only", vec!["taxonomies:write"]),
+    ] {
+        let (status, _) = create_pat(
+            &server,
+            &cookie,
+            serde_json::json!({ "name": name, "scopes": scopes }),
+        )
+        .await;
+        assert_eq!(status, 400, "{name} requires its read prerequisite");
+    }
+
     let session = mcp_initialize(&server, &pat).await;
 
-    // tools/list -> the read-only catalog: 16 read tools + get_import_mapping
-    // and find_transfer_matches (also activities:read) = 18.
+    // tools/list -> 18 read tools plus get_import_mapping and
+    // find_transfer_matches (also activities:read) = 20.
     let response = mcp_post(
         &server,
         Some(&pat),
@@ -310,8 +326,8 @@ async fn mcp_pat_lifecycle() {
     let tools = list["result"]["tools"].as_array().unwrap();
     assert_eq!(
         tools.len(),
-        18,
-        "read-only catalog must expose 18 tools (incl. get_import_mapping): {tools:?}"
+        20,
+        "read-only catalog must expose 20 tools (incl. MCP entity detail reads): {tools:?}"
     );
 
     // (h) tools/call succeeds and writes an audit row (awaited before the
@@ -458,9 +474,8 @@ async fn mcp_pat_lifecycle() {
 
 /// A write/suggest-scoped token sees the draft, suggest, commit, AND import
 /// tools via `tools/list` — proving scope-gated visibility extends past the
-/// read-only catalog. (Read-only tokens see 18; the full MCP catalog is
-/// 16 read + 5 draft/suggest + 5 commit + 3 import + 3 transfer linking +
-/// 2 quote import + 2 activity updates = 36.)
+/// read-only catalog. (Read-only tokens see 20; the full MCP catalog adds
+/// 17 entity writes and 2 detail reads to the prior 36-tool catalog = 55.)
 #[tokio::test]
 async fn mcp_write_scoped_token_sees_write_tools() {
     let server = spawn_server(true, false).await;
@@ -475,6 +490,11 @@ async fn mcp_write_scoped_token_sees_write_tools() {
             "classification:suggest",
             "classification:write",
             "market-data:write",
+            "accounts:write",
+            "holdings:write",
+            "portfolios:write",
+            "financial-planning:write",
+            "taxonomies:write",
         ])
         .collect();
     let (status, created) = create_pat(
@@ -484,7 +504,7 @@ async fn mcp_write_scoped_token_sees_write_tools() {
     )
     .await;
     assert_eq!(status, 201);
-    assert_eq!(created["scopes"].as_array().unwrap().len(), 12);
+    assert_eq!(created["scopes"].as_array().unwrap().len(), 17);
     let pat = created["token"].as_str().unwrap().to_string();
 
     let session = mcp_initialize(&server, &pat).await;
@@ -501,8 +521,8 @@ async fn mcp_write_scoped_token_sees_write_tools() {
     let names: Vec<&str> = tools.iter().map(|t| t["name"].as_str().unwrap()).collect();
     assert_eq!(
         tools.len(),
-        36,
-        "full-scope token must see all 36 tools: {names:?}"
+        55,
+        "full-scope token must see all 55 tools: {names:?}"
     );
     for name in [
         "find_transfer_matches",
@@ -512,6 +532,25 @@ async fn mcp_write_scoped_token_sees_write_tools() {
         "commit_quote_import",
         "prepare_activity_updates",
         "commit_activity_updates",
+        "create_account",
+        "update_account",
+        "create_portfolio",
+        "update_portfolio",
+        "get_goal_details",
+        "create_goal",
+        "update_goal",
+        "replace_goal_funding",
+        "save_goal_plan",
+        "create_contribution_limit",
+        "update_contribution_limit",
+        "get_asset_profile",
+        "create_manual_asset",
+        "update_asset_profile",
+        "create_taxonomy",
+        "update_taxonomy",
+        "create_category",
+        "update_category",
+        "move_category",
     ] {
         assert!(names.contains(&name), "{name} visible");
     }
@@ -541,6 +580,319 @@ async fn mcp_write_scoped_token_sees_write_tools() {
         names.contains(&"commit_asset_classification_draft"),
         "classification commit tool visible"
     );
+}
+
+/// Exercise the new scoped entity-write tools through the real MCP server and
+/// domain services, including the read-before-update paths.
+#[tokio::test]
+async fn mcp_entity_writes_use_domain_services() {
+    let server = spawn_server(true, false).await;
+    let cookie = login(&server).await;
+    let scopes: Vec<&str> = READ_ONLY_SCOPES
+        .iter()
+        .copied()
+        .chain([
+            "accounts:write",
+            "holdings:write",
+            "portfolios:write",
+            "financial-planning:write",
+            "taxonomies:write",
+        ])
+        .collect();
+    let (status, created_pat) = create_pat(
+        &server,
+        &cookie,
+        serde_json::json!({ "name": "entity writer", "scopes": scopes }),
+    )
+    .await;
+    assert_eq!(status, 201);
+    let pat = created_pat["token"].as_str().unwrap().to_string();
+    let session = mcp_initialize(&server, &pat).await;
+
+    let account = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_account",
+        serde_json::json!({
+            "name": "MCP cash account",
+            "accountType": "CASH",
+            "group": "MCP group",
+            "currency": "USD"
+        }),
+    )
+    .await;
+    let account_id = account["id"].as_str().unwrap().to_string();
+    let updated_account = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_account",
+        serde_json::json!({
+            "accountId": account_id,
+            "name": "MCP cash account updated",
+            "accountType": "CASH"
+        }),
+    )
+    .await;
+    assert_eq!(updated_account["name"], "MCP cash account updated");
+    assert_eq!(updated_account["group"], "MCP group");
+    assert_eq!(updated_account["isActive"], true);
+
+    let portfolio = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_portfolio",
+        serde_json::json!({
+            "name": "MCP portfolio",
+            "accountIds": [account_id]
+        }),
+    )
+    .await;
+    let portfolio_id = portfolio["id"].as_str().unwrap().to_string();
+    let updated_portfolio = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_portfolio",
+        serde_json::json!({
+            "id": portfolio_id,
+            "name": "MCP portfolio updated",
+            "description": null,
+            "sortOrder": 0,
+            "accountIds": [account_id]
+        }),
+    )
+    .await;
+    assert_eq!(updated_portfolio["name"], "MCP portfolio updated");
+
+    let goal = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_goal",
+        serde_json::json!({
+            "goalType": "save_up",
+            "title": "MCP goal",
+            "targetAmount": 10000,
+            "priority": 1,
+            "currency": "USD"
+        }),
+    )
+    .await;
+    let goal_id = goal["id"].as_str().unwrap().to_string();
+    let details = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "get_goal_details",
+        serde_json::json!({ "goalId": goal_id }),
+    )
+    .await;
+    assert_eq!(details["goal"]["title"], "MCP goal");
+    let updated_goal = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_goal",
+        serde_json::json!({
+            "goalId": goal_id,
+            "title": "MCP goal updated",
+            "description": null,
+            "targetAmount": 12000,
+            "statusLifecycle": "active",
+            "priority": 2,
+            "coverImageKey": null,
+            "currency": "USD",
+            "startDate": null,
+            "targetDate": null
+        }),
+    )
+    .await;
+    assert_eq!(updated_goal["title"], "MCP goal updated");
+    let funding = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "replace_goal_funding",
+        serde_json::json!({
+            "goalId": goal_id,
+            "rules": [{ "accountId": account_id, "sharePercent": 50, "taxBucket": null }]
+        }),
+    )
+    .await;
+    assert_eq!(funding.as_array().unwrap().len(), 1);
+    let saved_plan = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "save_goal_plan",
+        serde_json::json!({
+            "goalId": goal_id,
+            "planKind": "save_up",
+            "plannerMode": null,
+            "settingsJson": "{\"targetDate\":\"2030-01-01\"}"
+        }),
+    )
+    .await;
+    assert_eq!(saved_plan["goalId"], goal_id);
+
+    let limit = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_contribution_limit",
+        serde_json::json!({
+            "groupName": "MCP limit",
+            "contributionYear": 2025,
+            "limitAmount": 7000,
+            "accountIds": [account_id]
+        }),
+    )
+    .await;
+    let limit_id = limit["saved"]["id"].as_str().unwrap().to_string();
+    let updated_limit = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_contribution_limit",
+        serde_json::json!({
+            "id": limit_id,
+            "groupName": "MCP limit updated",
+            "contributionYear": 2025,
+            "limitAmount": 7500,
+            "accountIds": [account_id],
+            "startDate": null,
+            "endDate": null
+        }),
+    )
+    .await;
+    assert_eq!(updated_limit["saved"]["groupName"], "MCP limit updated");
+
+    let asset = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_manual_asset",
+        serde_json::json!({
+            "kind": "PROPERTY",
+            "name": "MCP property",
+            "quoteCcy": "USD"
+        }),
+    )
+    .await;
+    let asset_id = asset["id"].as_str().unwrap().to_string();
+    let asset_profile = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "get_asset_profile",
+        serde_json::json!({ "assetId": asset_id }),
+    )
+    .await;
+    assert_eq!(asset_profile["name"], "MCP property");
+    let updated_asset = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_asset_profile",
+        serde_json::json!({
+            "assetId": asset_id,
+            "name": "MCP property updated",
+            "displayCode": "HOME",
+            "notes": "User confirmed asset note",
+            "quoteMode": "MANUAL",
+            "quoteCcy": "USD"
+        }),
+    )
+    .await;
+    assert_eq!(updated_asset["name"], "MCP property updated");
+
+    let taxonomy = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_taxonomy",
+        serde_json::json!({ "name": "MCP taxonomy", "color": "#123456" }),
+    )
+    .await;
+    let taxonomy_id = taxonomy["id"].as_str().unwrap().to_string();
+    let category = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_category",
+        serde_json::json!({
+            "taxonomyId": taxonomy_id,
+            "name": "Parent",
+            "key": "parent",
+            "color": "#abcdef"
+        }),
+    )
+    .await;
+    let category_id = category["id"].as_str().unwrap().to_string();
+    let child = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "create_category",
+        serde_json::json!({
+            "taxonomyId": taxonomy_id,
+            "name": "Child",
+            "key": "child",
+            "color": "#fedcba"
+        }),
+    )
+    .await;
+    let child_id = child["id"].as_str().unwrap().to_string();
+    let updated_category = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_category",
+        serde_json::json!({
+            "taxonomyId": taxonomy_id,
+            "id": category_id,
+            "name": "Parent updated",
+            "key": "parent",
+            "color": "#abcdef",
+            "description": null,
+            "sortOrder": 0,
+            "icon": null
+        }),
+    )
+    .await;
+    assert_eq!(updated_category["name"], "Parent updated");
+    let moved_category = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "move_category",
+        serde_json::json!({
+            "taxonomyId": taxonomy_id,
+            "categoryId": child_id,
+            "newParentId": category_id,
+            "position": 0
+        }),
+    )
+    .await;
+    assert_eq!(moved_category["parentId"], category_id);
+    let updated_taxonomy = mcp_call_tool(
+        &server,
+        &pat,
+        &session,
+        "update_taxonomy",
+        serde_json::json!({
+            "id": taxonomy_id,
+            "name": "MCP taxonomy updated",
+            "color": "#123456",
+            "description": null,
+            "sortOrder": 0
+        }),
+    )
+    .await;
+    assert_eq!(updated_taxonomy["name"], "MCP taxonomy updated");
 }
 
 /// Exercise the actual MCP tools, shared resolver, writer and SQLite storage.

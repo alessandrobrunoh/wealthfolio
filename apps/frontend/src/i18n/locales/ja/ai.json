@@ -607,6 +607,28 @@
       "repetitionBlurb": "モデルが同じ内容を繰り返すのを抑制します。",
       "otherTitle": "その他",
       "otherBlurb": "プロバイダー固有のその他のオプション。"
+    },
+    "customProvider": {
+      "add": "カスタムプロバイダーを追加",
+      "createTitle": "カスタムプロバイダーを追加",
+      "editTitle": "カスタムプロバイダーを編集",
+      "description": "OpenAI互換のChat Completionsエンドポイントに接続します。",
+      "name": "プロバイダー名",
+      "baseUrl": "ベースURL",
+      "baseUrlHint": "リモートエンドポイントにはHTTPSを使用してください。HTTPはlocalhostのみ許可されます。/chat/completionsを除いたAPIのベースパスを入力してください。",
+      "defaultModel": "既定のモデルID",
+      "models": "利用可能なモデルID",
+      "modelsHint": "モデルIDを1行に1つ、またはカンマ区切りで入力してください。",
+      "create": "プロバイダーを作成",
+      "edit": "カスタムプロバイダーを編集",
+      "delete": "カスタムプロバイダーを削除",
+      "deleteTitle": "このカスタムプロバイダーを削除しますか？",
+      "deleteDescription": "プロバイダー設定と保存済みAPIキーを削除します。既存の会話は削除されません。",
+      "created": "カスタムプロバイダーを追加しました",
+      "updated": "カスタムプロバイダーを更新しました",
+      "deleted": "カスタムプロバイダーを削除しました",
+      "saveFailed": "カスタムプロバイダーを保存できませんでした",
+      "deleteFailed": "カスタムプロバイダーを削除できませんでした"
     }
   }
 }

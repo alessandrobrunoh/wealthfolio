@@ -663,6 +663,28 @@
       "repetitionBlurb": "Scoraggia il modello dal ripetersi.",
       "otherTitle": "Altro",
       "otherBlurb": "Opzioni varie specifiche del provider."
+    },
+    "customProvider": {
+      "add": "Aggiungi provider personalizzato",
+      "createTitle": "Aggiungi un provider personalizzato",
+      "editTitle": "Modifica provider personalizzato",
+      "description": "Collega un endpoint Chat Completions compatibile con OpenAI.",
+      "name": "Nome provider",
+      "baseUrl": "URL base",
+      "baseUrlHint": "Per gli endpoint remoti usa HTTPS; HTTP è consentito solo per localhost. Inserisci il percorso base dell'API senza il suffisso /chat/completions.",
+      "defaultModel": "ID modello predefinito",
+      "models": "ID modelli disponibili",
+      "modelsHint": "Inserisci un ID modello per riga o separali con virgole.",
+      "create": "Crea provider",
+      "edit": "Modifica provider personalizzato",
+      "delete": "Elimina provider personalizzato",
+      "deleteTitle": "Eliminare questo provider personalizzato?",
+      "deleteDescription": "Verranno rimossi le impostazioni del provider e la chiave API salvata. Le conversazioni esistenti non verranno eliminate.",
+      "created": "Provider personalizzato aggiunto",
+      "updated": "Provider personalizzato aggiornato",
+      "deleted": "Provider personalizzato eliminato",
+      "saveFailed": "Impossibile salvare il provider personalizzato",
+      "deleteFailed": "Impossibile eliminare il provider personalizzato"
     }
   }
 }

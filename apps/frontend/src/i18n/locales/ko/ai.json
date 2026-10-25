@@ -607,6 +607,28 @@
       "repetitionBlurb": "모델이 스스로 반복하지 않도록 억제합니다.",
       "otherTitle": "기타",
       "otherBlurb": "기타 제공자별 옵션입니다."
+    },
+    "customProvider": {
+      "add": "사용자 지정 제공자 추가",
+      "createTitle": "사용자 지정 제공자 추가",
+      "editTitle": "사용자 지정 제공자 편집",
+      "description": "OpenAI 호환 Chat Completions 엔드포인트에 연결합니다.",
+      "name": "제공자 이름",
+      "baseUrl": "기본 URL",
+      "baseUrlHint": "원격 엔드포인트에는 HTTPS를 사용하세요. HTTP는 localhost에서만 허용됩니다. /chat/completions 접미사를 제외한 API 기본 경로를 입력하세요.",
+      "defaultModel": "기본 모델 ID",
+      "models": "사용 가능한 모델 ID",
+      "modelsHint": "모델 ID를 한 줄에 하나씩 또는 쉼표로 구분해 입력하세요.",
+      "create": "제공자 만들기",
+      "edit": "사용자 지정 제공자 편집",
+      "delete": "사용자 지정 제공자 삭제",
+      "deleteTitle": "이 사용자 지정 제공자를 삭제할까요?",
+      "deleteDescription": "제공자 설정과 저장된 API 키가 삭제됩니다. 기존 대화는 삭제되지 않습니다.",
+      "created": "사용자 지정 제공자를 추가했습니다",
+      "updated": "사용자 지정 제공자를 업데이트했습니다",
+      "deleted": "사용자 지정 제공자를 삭제했습니다",
+      "saveFailed": "사용자 지정 제공자를 저장하지 못했습니다",
+      "deleteFailed": "사용자 지정 제공자를 삭제하지 못했습니다"
     }
   }
 }
