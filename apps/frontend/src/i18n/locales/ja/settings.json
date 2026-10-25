@@ -107,6 +107,8 @@
   "appearance_theme_description": "アプリケーションで使用するテーマを選択します。",
   "appearance_menu_bar": "メニューバーを表示",
   "appearance_menu_bar_description": "アプリケーションのメニューバーの表示を切り替えます。",
+  "appearance_connect_navigation": "ナビゲーションにWealthfolio Connectを表示",
+  "appearance_connect_navigation_description": "サイドバーとナビゲーションバーからConnectアイコンを非表示にします。Connectのページと設定は引き続き利用できます。",
   "appearance_theme_required": "テーマを選択してください。",
   "appearance_font_error": "フォントを選択",
   "appearance_font_required": "フォントを選択してください。",

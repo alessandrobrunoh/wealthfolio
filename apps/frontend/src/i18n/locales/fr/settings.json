@@ -107,6 +107,8 @@
   "appearance_theme_description": "Sélectionnez votre thème préféré pour l'application.",
   "appearance_menu_bar": "Afficher la barre de menu",
   "appearance_menu_bar_description": "Basculer pour afficher la barre de menu de l'application.",
+  "appearance_connect_navigation": "Afficher Wealthfolio Connect dans la navigation",
+  "appearance_connect_navigation_description": "Masque l'icône Connect dans la barre latérale et les barres de navigation. Les pages et paramètres Connect restent accessibles.",
   "appearance_theme_required": "Veuillez sélectionner un thème.",
   "appearance_font_error": "Sélectionner une police",
   "appearance_font_required": "Veuillez sélectionner une police.",

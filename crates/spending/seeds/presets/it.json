@@ -1,0 +1,377 @@
+{
+  "presetId": "it",
+  "presetVersion": "2026-06.1",
+  "name": "Italy",
+  "description": "Broad Italian-language rules for common national and regional merchants, bills, transport, health, shopping, public payments, and bank fees; includes legacy descriptors useful for historical transactions.",
+  "language": "it-IT",
+  "rules": [
+    {
+      "key": "it.groceries.major_chains",
+      "name": "Groceries — major chains",
+      "pattern": "(?i)\\b(?:esselunga|conad|coop(?:\\s+(?:alleanza|lombardia|nordest|tirreno|etruria|italia))?|ipercoop|eurospin|lidl|aldi|md\\s+(?:discount|s\\.?p\\.?a\\.?)|carrefour(?:\\s+(?:market|express))?|bennet|pam(?:\\s+panorama)?|panorama|despar|eurospar|interspar|famila|a\\s*&\\s*o|penny(?:\\s*market)?|cra[iì]|unes|iperal)\\b",
+      "matchType": "regex",
+      "categoryKey": "groceries",
+      "priority": 80
+    },
+    {
+      "key": "it.groceries.discount_and_regional_chains",
+      "name": "Discount and regional supermarket chains",
+      "pattern": "(?i)\\b(?:basko|ek[oò]m|dpi[uù]|i\\.?n['’]?s\\s+mercato|mercat[oò]|tigros|rossetto|migross|tosano|il gigante|sigma supermercati|dodec[aà]|dec[oò](?:\\s+(?:supermercati|market|superstore))?|sole ?365|sole365|pewex|oasi|tigre|prix quality|eataly|natura ?s[iì])\\b",
+      "matchType": "regex",
+      "categoryKey": "groceries",
+      "priority": 80
+    },
+    {
+      "key": "it.groceries.regional_and_local",
+      "name": "Regional and local supermarkets",
+      "pattern": "(?i)\\b(?:ali super(?:mercati)?|al[iì] supermercati|cadoro|d[iì] per d[iì]|doro|emi supermercati|em[iì]|elite supermercati|et[eé] supermercati|giacon|hurr[aà]|la buona bottega|max[iì] supermercati|nonna isa|poli supermercati|rossotono|sapore di mare|sisa supermercati|to\\.market)\\b",
+      "matchType": "regex",
+      "categoryKey": "groceries",
+      "priority": 78
+    },
+    {
+      "key": "it.groceries.online",
+      "name": "Online grocery shopping",
+      "pattern": "(?i)\\b(?:everli|esselunga online|conad spesa online|spesa online|spesa a casa|delivery supermercato|too good to go)\\b",
+      "matchType": "regex",
+      "categoryKey": "groceries",
+      "priority": 82
+    },
+    {
+      "key": "it.coffee_bakeries",
+      "name": "Cafes, bakeries and coffee",
+      "pattern": "(?i)\\b(?:bar|caff[eè]|coffee shop|panificio|panetteria|forno|pasticceria|autogrill|lavazza|illy caff[eè]|caff[eè] nero|la piadineria|starbucks|arnold coffee|venchi)\\b",
+      "matchType": "regex",
+      "categoryKey": "food_coffee",
+      "priority": 74
+    },
+    {
+      "key": "it.restaurants",
+      "name": "Restaurants and fast food",
+      "pattern": "(?i)\\b(?:ristorante|trattoria|pizzeria|osteria|tavola calda|mcdonald'?s?|burger king|kfc|subway|old wild west|roadhouse|rossopomodoro|dispensa emilia|signorvino ristorante|sushi(?:\\s|$)|miscusi|five guys|domino'?s|pizza hut|la piadineria)\\b",
+      "matchType": "regex",
+      "categoryKey": "food_restaurants",
+      "priority": 76
+    },
+    {
+      "key": "it.food_delivery",
+      "name": "Food delivery",
+      "pattern": "(?i)\\b(?:glovo|deliveroo|just ?eat|uber ?eats|foodracers|cosaporto|alfonsino)\\b",
+      "matchType": "regex",
+      "categoryKey": "food_delivery",
+      "priority": 85
+    },
+    {
+      "key": "it.eataly_restaurants",
+      "name": "Eataly restaurants",
+      "pattern": "(?i)\\beataly\\b.{0,25}\\b(?:ristorante|cucina|caff[eè])\\b",
+      "matchType": "regex",
+      "categoryKey": "food_restaurants",
+      "priority": 88
+    },
+    {
+      "key": "it.alcohol",
+      "name": "Wine shops and bars",
+      "pattern": "(?i)\\b(?:enoteca|vinoteca|birreria|pub|tannico|vino\\.com|signorvino|winelivery|cantine?\\s+italiane|cantina\\s+sociale|birraio|beershop)\\b",
+      "matchType": "regex",
+      "categoryKey": "food_alcohol",
+      "priority": 72
+    },
+    {
+      "key": "it.fuel",
+      "name": "Fuel stations",
+      "pattern": "(?i)\\b(?:eni(?:live)?|agip|api[- ]?ip|q8|esso|tamoil|shell|pompe bianche|beyfin|europam|retitalia|energas|keropetrol|vega carburanti|sarni oil|conad carburanti|carrefour carburanti|eni station|ip petrol)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_gas",
+      "priority": 84
+    },
+    {
+      "key": "it.ev_charging",
+      "name": "Electric vehicle charging",
+      "pattern": "(?i)\\b(?:enel x way|be charge|plenitude on the road|a2a e-?mobility|ionity|hpc charging|duferco energia ricarica|evway|juicepass)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_gas",
+      "priority": 86
+    },
+    {
+      "key": "it.public_transport_rail",
+      "name": "Rail and intercity transport",
+      "pattern": "(?i)\\b(?:trenitalia|frecciarossa|frecciargento|frecciabianca|trenord|trenitalia tper|italo(?: treno)?|italo ntv|ferrovie del sud est|eav|ferrovie del gargano|trenitalia regionale|flixbus|itabus|marino bus|blablacar bus|sais autolinee)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_public",
+      "priority": 84
+    },
+    {
+      "key": "it.public_transport_local",
+      "name": "Local public transport",
+      "pattern": "(?i)\\b(?:atm milano|atac|cotral|gtt(?: torino)?|anm(?: napoli)?|amt genova|amt catania|amat palermo|actv(?: venezia)?|avm venezia|tper|autolinee toscane|tiemme|mom mobilit[aà] di marca|sasa|arst|seta|start romagna|atb servizi|apam|arriva italia|busitalia|metrebus|trasporto pubblico locale)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_public",
+      "priority": 82
+    },
+    {
+      "key": "it.rideshare_taxi",
+      "name": "Taxi, ride-hailing and shared mobility",
+      "pattern": "(?i)\\b(?:uber|free ?now|freenow|bolt|it ?taxi|ittaxi|wetaxi|apptaxi|taxi app|taxi roma|enjoy car sharing|enilive enjoy|drivalia|free2move|share now|e-?vai|corrente sharing|cooltra|dott|lime|bird)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_rideshare",
+      "priority": 82
+    },
+    {
+      "key": "it.parking_tolls",
+      "name": "Parking and road tolls",
+      "pattern": "(?i)\\b(?:telepass|autostrade per l['’]italia|autostrada|pedemontana|autovia|easypark|mooneygo|parcheggio|parking|strisce blu|sosta a pagamento|parcheggi(?:o)? apcoa|parclick|parkin\\s*go|mycicero|unipol move)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_parking",
+      "priority": 83
+    },
+    {
+      "key": "it.car_maintenance",
+      "name": "Car maintenance and inspections",
+      "pattern": "(?i)\\b(?:revisione auto|tagliando|gommista|officina|carrozzeria|midas|norauto|euromaster|bestdrive|pit stop|aci soccorso|aci automobile club|lavaggio auto|centro revisioni|ricambi auto|carglass)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_maintenance",
+      "priority": 82
+    },
+    {
+      "key": "it.auto_insurance",
+      "name": "Car insurance",
+      "pattern": "(?i)\\b(?:rc auto|rca|assicurazione auto|polizza auto|assicurazione moto|polizza moto|assicurazione veicolo|polizza veicolo)\\b",
+      "matchType": "regex",
+      "categoryKey": "transport_insurance",
+      "priority": 86
+    },
+    {
+      "key": "it.airlines",
+      "name": "Airlines",
+      "pattern": "(?i)\\b(?:ita airways|alitalia|ryanair|easyjet|wizz ?air|volotea|ne[aà]os|air dolomiti|lufthansa|vueling|air france|klm|british airways|emirates|qatar airways)\\b",
+      "matchType": "regex",
+      "categoryKey": "travel",
+      "priority": 90
+    },
+    {
+      "key": "it.hotels_travel",
+      "name": "Hotels and travel booking",
+      "pattern": "(?i)\\b(?:booking\\.com|airbnb|expedia|hotels\\.com|trivago|eDreams|lastminute\\.com|alpitour|francorosso|eden viaggi|turisanda|voihotels|grimaldi lines|gnv|traghetti|hotel|albergo|villaggio turistico|bed and breakfast)\\b",
+      "matchType": "regex",
+      "categoryKey": "travel",
+      "priority": 85
+    },
+    {
+      "key": "it.streaming",
+      "name": "Streaming and digital media",
+      "pattern": "(?i)\\b(?:netflix|spotify|dazn|now tv|nowtv|sky italia|timvision|mediaset infinity|raiplay|disney ?\\+|prime video|amazon prime video|paramount ?\\+|apple tv ?\\+|apple music|youtube premium|deezer|crunchyroll|discovery ?\\+|audible)\\b",
+      "matchType": "regex",
+      "categoryKey": "entertainment_streaming",
+      "priority": 84
+    },
+    {
+      "key": "it.software_cloud",
+      "name": "Software and cloud subscriptions",
+      "pattern": "(?i)\\b(?:adobe|microsoft ?365|office 365|icloud|dropbox|google one|chatgpt|openai|canva|notion|github|jetbrains|1password|zoom\\.us|slack|grammarly|apple\\.com/bill)\\b",
+      "matchType": "regex",
+      "categoryKey": "bills_software",
+      "priority": 80
+    },
+    {
+      "key": "it.telecom_mobile",
+      "name": "Mobile phone providers",
+      "pattern": "(?i)\\b(?:tim|telecom italia|vodafone|wind ?tre|windtre|iliad|fastweb|postemobile|poste mobile|kena mobile|ho\\. ?mobile|very mobile|coopvoce|tiscali mobile|lyca ?mobile|1mobile|spusu|sky mobile)\\b",
+      "matchType": "regex",
+      "categoryKey": "bills_phone",
+      "priority": 80
+    },
+    {
+      "key": "it.telecom_internet",
+      "name": "Home internet and broadband",
+      "pattern": "(?i)\\b(?:fibra|adsl|internet|wifi|wi-fi)\\b",
+      "matchType": "regex",
+      "categoryKey": "bills_internet",
+      "priority": 84
+    },
+    {
+      "key": "it.utilities_energy",
+      "name": "Electricity and gas",
+      "pattern": "(?i)\\b(?:enel energia|eni plenitude|plenitude luce|a2a energia|hera comm|iren mercato|iren luce|acea energia|edison energia|sorgenia|engie|e\\.?on energia|dolomiti energia|alperia|cva energia|agsm aim|est energia|wekiwi|illumia|octopus energy|egea energia|duferco energia|b\\.luce|blenergy|energia pulita|fornitura luce|bolletta (?:luce|gas)|servizio elettrico nazionale|neN energia)\\b",
+      "matchType": "regex",
+      "categoryKey": "housing_utilities",
+      "priority": 88
+    },
+    {
+      "key": "it.utilities_water_waste",
+      "name": "Water, waste and local utilities",
+      "pattern": "(?i)\\b(?:acea ato ?\\d*|acquedotto pugliese|abbanoa|publiacqua|acque spa|gruppo cap|cap holding|smat|mm spa|hera acqua|iren acqua|a2a ciclo idrico|acqua novara|alto trevigiano servizi|veritas|brianzacque|aqp|ama roma|amsa|hera ambiente|iren ambiente|a2a ambiente|tari|bolletta acqua|servizio idrico|gestore rifiuti)\\b",
+      "matchType": "regex",
+      "categoryKey": "housing_utilities",
+      "priority": 82
+    },
+    {
+      "key": "it.rent_mortgage",
+      "name": "Rent and mortgage",
+      "pattern": "(?i)\\b(?:affitto|canone affitto|locazione|rata mutuo|mutuo casa|mutuo ipotecario|agenzia immobiliare|amministratore condominio|spese condominiali|immobiliare\\.it|idealista|tecnocasa|engel ?&? ?v[oö]lkers)\\b",
+      "matchType": "regex",
+      "categoryKey": "housing_rent",
+      "priority": 88
+    },
+    {
+      "key": "it.home_insurance",
+      "name": "Home insurance",
+      "pattern": "(?i)\\b(?:assicurazione casa|assicurazione abitazione|polizza casa|polizza abitazione|assicurazione incendio|polizza incendio e furto|polizza per la casa)\\b",
+      "matchType": "regex",
+      "categoryKey": "housing_insurance",
+      "priority": 86
+    },
+    {
+      "key": "it.online_marketplaces",
+      "name": "Online marketplaces",
+      "pattern": "(?i)\\b(?:amazon(?:\\.it)?|ebay|temu|aliexpress|subito(?:\\.it)?|vinted|wallapop|etsy|manomano|shopify|shein|zalando|eprice|privalia|yoox|bonprix)\\b",
+      "matchType": "regex",
+      "categoryKey": "shopping_online",
+      "priority": 72
+    },
+    {
+      "key": "it.clothing",
+      "name": "Clothing and department stores",
+      "pattern": "(?i)\\b(?:ovs|zara|h\\s*&\\s*m|benetton|calzedonia|intimissimi|tezenis|coin|upim|rinascente|max mara|max&co|motivi|ovs kids|pittarosso|scarpe&scarpe|foot locker|decathlon|cisalfa|intersport|jd sports|primark|mango|uniqlo|geox|original marines|armani exchange|guess|falconeri|yamamay)\\b",
+      "matchType": "regex",
+      "categoryKey": "shopping_clothing",
+      "priority": 80
+    },
+    {
+      "key": "it.electronics",
+      "name": "Electronics and appliances",
+      "pattern": "(?i)\\b(?:unieuro|media ?world|euronics|expert(?: point)?|trony|sinergy|comet|apple store|apple\\.com|samsung store|eprice|yeppon|monclick|marcopolo expert)\\b",
+      "matchType": "regex",
+      "categoryKey": "shopping_electronics",
+      "priority": 84
+    },
+    {
+      "key": "it.home_diy",
+      "name": "Home, furniture and DIY",
+      "pattern": "(?i)\\b(?:ikea|leroy merlin|tecnomat|bricocenter|bricofer|obi|mondo convenienza|maisons du monde|jysk|kasanova|deghi|arredissim[aà]|mondoconv|risparmio casa|viridea|leroymerlin)\\b",
+      "matchType": "regex",
+      "categoryKey": "shopping_home",
+      "priority": 80
+    },
+    {
+      "key": "it.books",
+      "name": "Books and stationery",
+      "pattern": "(?i)\\b(?:feltrinelli|la feltrinelli|libraccio|ibs\\.it|mondadori store|libreria|libreria universitaria|hoepli|giunti al punto|cartoleria|librerie coop)\\b",
+      "matchType": "regex",
+      "categoryKey": "shopping",
+      "priority": 85
+    },
+    {
+      "key": "it.pharmacy",
+      "name": "Pharmacies and parapharmacies",
+      "pattern": "(?i)\\b(?:farmacia|farmacie|parafarmacia|dr\\.? ?max|lloyds farmacia|farmacie comunali|benu farmacia|farmacia loreto|farma[eè]|redcare|shop farmacia|farmacia online)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_pharmacy",
+      "priority": 85
+    },
+    {
+      "key": "it.medical",
+      "name": "Medical care and diagnostics",
+      "pattern": "(?i)\\b(?:humanitas|san raffaele|gruppo san donato|ospedale|clinica|poliambulatorio|centro medico|laboratorio analisi|cup sanitario|miodottore|doctolib|synlab|auxologico|gvm care|centro diagnostico|fisioterapia|fisioterapista|medico specialista)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_medical",
+      "priority": 84
+    },
+    {
+      "key": "it.dental",
+      "name": "Dental care",
+      "pattern": "(?i)\\b(?:dentista|studio dentistico|clinica dentale|dentalpro|odontoiatra|ortodonzia|centro odontoiatrico|dentix|dentalcoop)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_dental",
+      "priority": 86
+    },
+    {
+      "key": "it.vision",
+      "name": "Opticians and vision care",
+      "pattern": "(?i)\\b(?:ottica|occhiali|salmoiraghi e vigan[oò]|grandvision|ottica avanzi|ottica greenvision|ottica afflelou|vistaexpert|ottica vision)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_vision",
+      "priority": 84
+    },
+    {
+      "key": "it.health_insurance",
+      "name": "Health insurance and mutual funds",
+      "pattern": "(?i)\\b(?:unisalute|si salute|metasalute|fondo est|faschim|casagit|san\\. ?arti|fasdac|quas|sanimoda|sanedil|cassa sanitaria|fondo sanitario integrativo|uni\\. ?ca|fondo salute)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_insurance",
+      "priority": 86
+    },
+    {
+      "key": "it.fitness",
+      "name": "Gyms and fitness",
+      "pattern": "(?i)\\b(?:fitactive|mcfit|virgin active|anytime fitness|fit express|fitup|palestra|fitness park|up level|getfit|sporting club|fitprime|urban sports club|basic-?fit)\\b",
+      "matchType": "regex",
+      "categoryKey": "health_fitness",
+      "priority": 84
+    },
+    {
+      "key": "it.personal_care",
+      "name": "Personal care and beauty",
+      "pattern": "(?i)\\b(?:acqua e sapone|tigot[aà]|kiko milano|sephora|douglas|lush|pinalli|profumeria|parrucchiere|parrucchiera|barbiere|barber shop|estetica|centro estetico|beauty salon|spa centro benessere)\\b",
+      "matchType": "regex",
+      "categoryKey": "personal",
+      "priority": 82
+    },
+    {
+      "key": "it.pets",
+      "name": "Pet shops and veterinary care",
+      "pattern": "(?i)\\b(?:arcaplanet|l['’]isola dei tesori|isoladeitesori|petstore conad|zooplus|kiwoko|tiendanimal|veterinario|clinica veterinaria|ambulatorio veterinario|toelettatura|pet shop)\\b",
+      "matchType": "regex",
+      "categoryKey": "personal",
+      "priority": 82
+    },
+    {
+      "key": "it.movies_events",
+      "name": "Cinema, events and tickets",
+      "pattern": "(?i)\\b(?:ticketone|vivaticket|ticketmaster|the space cinema|uci cinemas|notorious cinemas|cinesa|cinema|teatro|biglietti evento|livenation|cinelandia)\\b",
+      "matchType": "regex",
+      "categoryKey": "entertainment_movies",
+      "priority": 84
+    },
+    {
+      "key": "it.gaming",
+      "name": "Gaming platforms",
+      "pattern": "(?i)\\b(?:steam(?:games)?|playstation network|\\bpsn\\b|xbox(?: live| game pass)?|nintendo eshop|nintendo e-?shop|epic games|gamestop|ubisoft store|ea play)\\b",
+      "matchType": "regex",
+      "categoryKey": "entertainment_games",
+      "priority": 84
+    },
+    {
+      "key": "it.education",
+      "name": "Education and childcare",
+      "pattern": "(?i)\\b(?:universit[aà]|tasse universitarie|retta scolastica|scuola materna|asilo nido|scuola dell['’]infanzia|mensa scolastica|accademia|autoscuola|scuola guida|corsi di lingua|british council|udemy|coursera|pegaso universit[aà]|bocconi|luiss|politecnico)\\b",
+      "matchType": "regex",
+      "categoryKey": "education",
+      "priority": 82
+    },
+    {
+      "key": "it.donations",
+      "name": "Charities and donations",
+      "pattern": "(?i)\\b(?:donazione|donazione ricorrente|airc|emergency|croce rossa italiana|caritas|unicef|telethon|save the children|medici senza frontiere|wwf italia|legambiente|unhcr|medici del mondo|fondazione airc|lav lega anti vivisezione)\\b",
+      "matchType": "regex",
+      "categoryKey": "gifts",
+      "priority": 82
+    },
+    {
+      "key": "it.bank_fees",
+      "name": "Bank and account fees",
+      "pattern": "(?i)\\b(?:canone (?:del )?(?:conto|carta)|spese (?:di )?(?:tenuta|gestione) (?:del )?conto|commissione (?:di )?(?:bonifico|prelievo|carta|intervento)|commissioni bancarie|spese bancarie|imposta di bollo (?:sul )?conto|costo carta di credito|costo carta di debito|commissione valuta|commissione prelievo|costo tenuta conto|spese conto corrente|canone conto corrente)\\b",
+      "matchType": "regex",
+      "categoryKey": "fees_bank",
+      "priority": 90
+    },
+    {
+      "key": "it.government_payments",
+      "name": "Government, taxes and public payments",
+      "pattern": "(?i)\\b(?:f24(?:\\s+semplificato)?|pago ?pa|agenzia delle entrate|agenzia entrate riscossione|agenzia delle entrate-riscossione|contributi inps|inps contributi|contributi inail|inail premio|imu|tari|tasi|irpef|bollo auto|tassa automobilistica|superbollo|multa|contravvenzione|sanzione amministrativa|diritti di segreteria|tributi comunali|imposta comunale|tassa rifiuti|cartella esattoriale|comune di [a-zà-ù]+)\\b",
+      "matchType": "regex",
+      "categoryKey": "fees",
+      "priority": 90
+    }
+  ]
+}

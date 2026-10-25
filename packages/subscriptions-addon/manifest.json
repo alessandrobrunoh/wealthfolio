@@ -1,0 +1,34 @@
+{
+  "id": "subscriptions-addon",
+  "name": "Subscriptions",
+  "version": "1.0.0",
+  "description": "Track subscription prices, billing intervals, and upcoming charges.",
+  "author": "Wealthfolio",
+  "main": "dist/addon.js",
+  "sdkVersion": "3.11.0",
+  "minWealthfolioVersion": "3.11.0",
+  "enabled": true,
+  "contributes": {
+    "routes": [{ "id": "subscriptions" }],
+    "links": {
+      "sidebar": [
+        {
+          "id": "subscriptions",
+          "route": "subscriptions",
+          "label": "Subscriptions",
+          "icon": "calendar-check",
+          "order": 100
+        }
+      ]
+    }
+  },
+  "hostDependencies": {
+    "@wealthfolio/addon-sdk": "^3.11.0",
+    "@wealthfolio/ui": "^3.11.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "permissions": [],
+  "keywords": ["subscriptions", "recurring-expenses", "billing"],
+  "license": "MIT"
+}

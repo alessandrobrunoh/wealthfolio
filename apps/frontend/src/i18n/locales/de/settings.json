@@ -71,6 +71,8 @@
   "appearance_theme_description": "Bevorzugtes Farbschema der Anwendung.",
   "appearance_menu_bar": "Menüleiste anzeigen",
   "appearance_menu_bar_description": "Ein- und Ausblenden der Anwendungsmenüleiste.",
+  "appearance_connect_navigation": "Wealthfolio Connect in der Navigation anzeigen",
+  "appearance_connect_navigation_description": "Blendet das Connect-Symbol in der Seitenleiste und den Navigationsleisten aus. Connect-Seiten und -Einstellungen bleiben verfügbar.",
   "appearance_theme_required": "Bitte wählen Sie ein Design.",
   "appearance_font_error": "Wählen Sie eine Schriftart",
   "appearance_font_required": "Bitte wählen Sie eine Schriftart.",

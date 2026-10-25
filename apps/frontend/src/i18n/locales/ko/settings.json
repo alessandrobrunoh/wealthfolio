@@ -107,6 +107,8 @@
   "appearance_theme_description": "애플리케이션에서 사용할 테마를 선택하세요.",
   "appearance_menu_bar": "메뉴 바 표시",
   "appearance_menu_bar_description": "애플리케이션 메뉴 바 표시 여부를 전환합니다.",
+  "appearance_connect_navigation": "탐색에 Wealthfolio Connect 표시",
+  "appearance_connect_navigation_description": "사이드바와 탐색 바에서 Connect 아이콘을 숨깁니다. Connect 페이지와 설정은 계속 사용할 수 있습니다.",
   "appearance_theme_required": "테마를 선택하세요.",
   "appearance_font_error": "글꼴을 선택하세요",
   "appearance_font_required": "글꼴을 선택하세요.",

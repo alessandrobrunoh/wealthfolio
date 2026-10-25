@@ -107,6 +107,8 @@
   "appearance_theme_description": "為應用程式選取你偏好的主題。",
   "appearance_menu_bar": "顯示選單列",
   "appearance_menu_bar_description": "顯示應用程式選單列。",
+  "appearance_connect_navigation": "在導覽中顯示 Wealthfolio Connect",
+  "appearance_connect_navigation_description": "在側邊欄與導覽列中隱藏 Connect 圖示。Connect 頁面與設定仍可使用。",
   "appearance_theme_required": "請選取一個主題。",
   "appearance_font_error": "選取字體",
   "appearance_font_required": "請選取一種字體。",
