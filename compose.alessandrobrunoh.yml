@@ -1,0 +1,39 @@
+# Wealthfolio - Alessandro Brunoh's Traefik deployment
+#
+# Copy .env.docker.example to .env.docker and fill in the required secrets.
+# Start with: docker compose --env-file .env.docker -f compose.alessandrobrunoh.yml up -d
+
+services:
+  wealthfolio:
+    image: ghcr.io/alessandrobrunoh/wealthfolio:latest
+    container_name: wealthfolio
+    restart: unless-stopped
+    ports:
+      # Host-only: public traffic goes through Traefik on the `proxy` network.
+      - "127.0.0.1:8088:8088"
+    environment:
+      WF_LISTEN_ADDR: "0.0.0.0:8088"
+      WF_DB_PATH: /data/wealthfolio.db
+      WF_SECRET_KEY: "${WF_SECRET_KEY:?Set WF_SECRET_KEY in .env.docker}"
+      WF_AUTH_PASSWORD_HASH: "${WF_AUTH_PASSWORD_HASH:?Set WF_AUTH_PASSWORD_HASH in .env.docker}"
+      WF_CORS_ALLOW_ORIGINS: "https://wealthfolio.alessandrobrunoh.it"
+      WF_MCP_ENABLED: "true"
+    volumes:
+      - wealthfolio-data:/data
+    networks:
+      - proxy
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+      traefik.http.routers.wealthfolio.rule: "Host(`wealthfolio.alessandrobrunoh.it`)"
+      traefik.http.routers.wealthfolio.entrypoints: websecure
+      traefik.http.routers.wealthfolio.tls: "true"
+      traefik.http.routers.wealthfolio.tls.certresolver: le
+      traefik.http.services.wealthfolio.loadbalancer.server.port: "8088"
+
+volumes:
+  wealthfolio-data:
+
+networks:
+  proxy:
+    external: true
