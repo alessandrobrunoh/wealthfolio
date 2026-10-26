@@ -30,14 +30,14 @@ export const OnboardingAppearance = forwardRef<
   const fonts = useMemo(
     () => [
       {
-        value: "font-mono",
-        label: t("onboarding:appearance.fonts.monoLabel"),
-        description: t("onboarding:appearance.fonts.monoDescription"),
-      },
-      {
         value: "font-sans",
         label: t("onboarding:appearance.fonts.sansLabel"),
         description: t("onboarding:appearance.fonts.sansDescription"),
+      },
+      {
+        value: "font-mono",
+        label: t("onboarding:appearance.fonts.monoLabel"),
+        description: t("onboarding:appearance.fonts.monoDescription"),
       },
       {
         value: "font-serif",
@@ -48,7 +48,7 @@ export const OnboardingAppearance = forwardRef<
     [t],
   );
   const [theme, setTheme] = useState<string>(settings?.theme ?? "system");
-  const [font, setFont] = useState<string>(settings?.font ?? "font-mono");
+  const [font, setFont] = useState<string>(settings?.font ?? "font-sans");
   const { isMobile } = usePlatform();
   // Navigation style lives in localStorage (read by NavigationModeProvider on app
   // load); it only applies on large screens, so the picker is desktop-only.

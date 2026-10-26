@@ -1,5 +1,5 @@
 /* @name Classic */
-/* @font font-mono */
+/* @font font-sans */
 /* Classic is the base theme: every other theme inherits its value for
    any role it leaves out, so the roles it sets here are the whole contract. */
 :root {
