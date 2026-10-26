@@ -235,7 +235,7 @@ impl SettingsRepositoryTrait for SettingsRepository {
                 // Return default values for known settings
                 let default_value = match setting_key_param {
                     "theme" => "light",
-                    "font" => "font-mono",
+                    "font" => "font-sans",
                     "language" => "en",
                     "timezone" => "",
                     "onboarding_completed" => "false",
@@ -316,6 +316,17 @@ mod tests {
         let pool = create_pool(&db_path).unwrap();
         let writer = spawn_writer((*pool).clone()).unwrap();
         (SettingsRepository::new(pool, writer), dir)
+    }
+
+    #[tokio::test]
+    async fn font_defaults_to_sans_and_preserves_an_explicit_choice() {
+        let (repo, _dir) = setup().await;
+
+        assert_eq!(repo.get_settings().unwrap().font, "font-sans");
+        assert_eq!(repo.get_setting("font").unwrap(), "font-sans");
+
+        repo.update_setting("font", "font-mono").await.unwrap();
+        assert_eq!(repo.get_settings().unwrap().font, "font-mono");
     }
 
     #[tokio::test]
