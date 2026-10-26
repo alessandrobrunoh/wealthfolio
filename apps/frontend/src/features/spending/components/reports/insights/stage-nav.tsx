@@ -35,7 +35,7 @@ export function StageNav({ stage, onStageChange }: StageNavProps) {
   return (
     <nav
       aria-label={t("spending:insights.stagesLabel")}
-      className="border-border/60 bg-card/40 flex items-center gap-1 overflow-x-auto rounded-2xl border p-1 backdrop-blur-xl"
+      className="border-border bg-muted/50 flex items-center gap-1 overflow-x-auto rounded-lg border p-1"
     >
       {STAGES.map((s) => {
         const active = stage === s.id;
@@ -46,7 +46,7 @@ export function StageNav({ stage, onStageChange }: StageNavProps) {
             ref={active ? activeRef : undefined}
             onClick={() => onStageChange(s.id)}
             className={cn(
-              "group inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-xs transition-colors",
+              "group inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-xs transition-colors",
               active
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50",

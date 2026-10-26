@@ -231,7 +231,7 @@ export function InsightsDashboard({ widgets, onCustomizeActionChange }: Insights
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-full"
+                  className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-md"
                   aria-label={t("insights:customize.edit")}
                   disabled={isLoading || isError || !settings}
                   onClick={() => setDraft(readInsightsLayout(settings?.insightsOverviewLayout))}
@@ -261,12 +261,12 @@ export function InsightsDashboard({ widgets, onCustomizeActionChange }: Insights
               <div
                 role="toolbar"
                 aria-label={t("insights:customize.edit")}
-                className="bg-secondary/30 border-border/50 flex w-full items-center gap-1 rounded-full border p-1.5 sm:w-auto"
+                className="bg-secondary/30 border-border/50 flex w-full items-center gap-1 rounded-md border p-1 sm:w-auto"
               >
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 flex-1 gap-2 rounded-full px-3 sm:flex-none"
+                  className="h-9 flex-1 gap-2 rounded-md px-3 sm:flex-none"
                   disabled={saving}
                   onClick={() => setPickerOpen(true)}
                 >
@@ -280,7 +280,7 @@ export function InsightsDashboard({ widgets, onCustomizeActionChange }: Insights
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-full"
+                        className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-md"
                         aria-label={t("insights:customize.reset")}
                         disabled={saving}
                         onClick={() => setDraft(defaultInsightsLayout())}
@@ -297,7 +297,7 @@ export function InsightsDashboard({ widgets, onCustomizeActionChange }: Insights
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-full"
+                        className="text-muted-foreground hover:text-foreground h-9 w-9 shrink-0 rounded-md"
                         aria-label={t("insights:customize.cancel")}
                         disabled={saving}
                         onClick={() => {
@@ -313,7 +313,7 @@ export function InsightsDashboard({ widgets, onCustomizeActionChange }: Insights
                 </Tooltip>
                 <Button
                   size="sm"
-                  className="ms-1 h-9 shrink-0 gap-1.5 rounded-full px-4"
+                  className="ms-1 h-9 shrink-0 gap-1.5 rounded-md px-4"
                   aria-label={t(saving ? "insights:customize.saving" : "insights:customize.save")}
                   disabled={saving}
                   onClick={() => void save()}

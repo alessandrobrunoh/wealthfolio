@@ -75,7 +75,7 @@ export function AppSidebar({ navigation }: AppSidebarProps) {
 
                   <span
                     className={cn(
-                      "text-md text-foreground/90 ms-2 font-serif text-xl font-bold transition-opacity delay-100 duration-300 ease-in-out",
+                      "text-foreground/90 ms-2 text-sm font-medium transition-opacity delay-100 duration-300 ease-in-out",
                       {
                         "sr-only opacity-0": collapsed,
                         "block opacity-100": !collapsed,
@@ -104,10 +104,10 @@ export function AppSidebar({ navigation }: AppSidebarProps) {
                     document.dispatchEvent(event);
                   }}
                   className={cn(
-                    "text-foreground [&_svg]:size-5! mb-4 h-12 transition-all duration-300",
+                    "text-foreground [&_svg]:size-5! mb-4 transition-all duration-300",
                     collapsed
                       ? "justify-center rounded-md"
-                      : "bg-muted/50 hover:bg-muted/80 justify-start rounded-full px-4 shadow-none",
+                      : "bg-muted/50 hover:bg-muted/80 justify-start rounded-md px-4 shadow-none",
                   )}
                   title={t("common:layout.search_shortcut", { shortcut: `${modKey}+K` })}
                 >
@@ -241,7 +241,7 @@ function PinnedAddonNavItem({ item, collapsed, onSetPinned }: PinnedAddonNavItem
               type="button"
               variant="ghost"
               size="icon"
-              className="hover:bg-accent pointer-events-none absolute end-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-full opacity-0 transition-opacity focus:pointer-events-auto focus:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
+              className="hover:bg-accent pointer-events-none absolute end-1 top-1/2 z-10 h-8 w-8 -translate-y-1/2 rounded-md opacity-0 transition-opacity focus:pointer-events-auto focus:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100"
               title={t("common:layout.addon_options", { name: item.title })}
               aria-label={t("common:layout.addon_options", { name: item.title })}
             />
@@ -281,7 +281,7 @@ function NavItem({ item, collapsed, className, ...props }: NavItemProps) {
       className={cn(
         buttonVariants({ variant: isActive ? "secondary" : "ghost" }),
         cn(
-          "text-foreground [&_svg]:size-5! mb-1 h-12 rounded-md transition-all duration-300",
+          "text-foreground [&_svg]:size-5! mb-1 rounded-md transition-all duration-150",
           collapsed ? "justify-center" : "justify-start",
           className,
         ),
@@ -321,7 +321,7 @@ function AddonsMenu({ addons, collapsed, onSetPinned }: AddonsMenuProps) {
           <Button
             variant={hasActiveAddon ? "secondary" : "ghost"}
             className={cn(
-              "text-foreground [&_svg]:size-5! mb-1 h-12 rounded-md transition-all duration-300",
+              "text-foreground [&_svg]:size-5! mb-1 rounded-md transition-all duration-150",
               collapsed ? "justify-center" : "justify-start",
             )}
           />
@@ -356,12 +356,12 @@ function AddonsMenu({ addons, collapsed, onSetPinned }: AddonsMenuProps) {
             <div
               key={addon.id ?? addon.href}
               className={cn(
-                "hover:bg-accent focus-within:bg-accent group flex h-12 items-center rounded-sm transition-colors",
+                "hover:bg-accent focus-within:bg-accent group flex h-10 items-center rounded-sm transition-colors",
                 isActive && "bg-secondary",
               )}
             >
               <DropdownMenuItem
-                className="h-12 min-w-0 flex-1 gap-3 px-3 py-3 text-sm font-medium"
+                className="h-10 min-w-0 flex-1 gap-3 px-3 py-2 text-sm font-medium"
                 render={<Link to={addon.href} onClick={() => setOpen(false)} />}
               >
                 <span
@@ -375,7 +375,7 @@ function AddonsMenu({ addons, collapsed, onSetPinned }: AddonsMenuProps) {
               {onSetPinned && (
                 <button
                   type="button"
-                  className="hover:bg-background focus:bg-background group-hover:bg-background hover:ring-border focus:ring-border group-hover:ring-border me-1 flex size-8 shrink-0 items-center justify-center rounded-full opacity-0 outline-none transition-[background-color,box-shadow,opacity] hover:ring-1 focus:opacity-100 focus:ring-1 group-hover:opacity-100 group-hover:ring-1"
+                  className="hover:bg-background focus:bg-background group-hover:bg-background hover:ring-border focus:ring-border group-hover:ring-border me-1 flex size-8 shrink-0 items-center justify-center rounded-md opacity-0 outline-none transition-[background-color,box-shadow,opacity] hover:ring-1 focus:opacity-100 focus:ring-1 group-hover:opacity-100 group-hover:ring-1"
                   title={t("common:layout.pin_to_sidebar")}
                   aria-label={t("common:layout.pin_addon_to_sidebar", { name: addon.title })}
                   onMouseDown={(event) => {

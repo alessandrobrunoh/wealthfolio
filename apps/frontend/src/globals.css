@@ -156,21 +156,21 @@
   --color-stone-*: initial;
 
   /* Specify new default colors. */
-  --color-black: #100f0f;
-  --color-paper: #fffcf0;
-  --color-base-50: #f2f0e5;
-  --color-base-100: #e6e4d9;
-  --color-base-150: #dad8ce;
-  --color-base-200: #cecdc3;
-  --color-base-300: #b7b5ac;
-  --color-base-400: #9f9d96;
-  --color-base-500: #878580;
-  --color-base-600: #6f6e69;
-  --color-base-700: #575653;
-  --color-base-800: #403e3c;
-  --color-base-850: #343331;
-  --color-base-900: #282726;
-  --color-base-950: #1c1b1a;
+  --color-black: #0a0a0a;
+  --color-paper: #ffffff;
+  --color-base-50: #fafafa;
+  --color-base-100: #f5f5f5;
+  --color-base-150: #f0f0f0;
+  --color-base-200: #e5e5e5;
+  --color-base-300: #d4d4d4;
+  --color-base-400: #a3a3a3;
+  --color-base-500: #737373;
+  --color-base-600: #525252;
+  --color-base-700: #404040;
+  --color-base-800: #262626;
+  --color-base-850: #1f1f1f;
+  --color-base-900: #171717;
+  --color-base-950: #0a0a0a;
   --color-red-50: #ffe1d5;
   --color-red-100: #ffcabb;
   --color-red-150: #fdb2a2;
@@ -722,7 +722,7 @@ body.qr-scan-active > .qr-overlay {
 
   /* Mobile-optimized card/panel styles */
   .card-mobile {
-    border-radius: 0.75rem; /* rounded-xl */
+    border-radius: 0.5rem; /* compact card radius */
     padding: 1rem; /* p-4 */
   }
 
@@ -733,7 +733,7 @@ body.qr-scan-active > .qr-overlay {
     }
 
     .card-mobile {
-      border-radius: 0.5rem; /* sm:rounded-lg */
+      border-radius: 0.375rem; /* compact desktop card radius */
       padding: 0.75rem; /* sm:p-3 */
     }
   }
@@ -987,7 +987,7 @@ summary {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  background: hsl(var(--flexoki-tx-2));
+  background: hsl(var(--palette-muted));
   border: 2px solid var(--color-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   cursor: grab;
@@ -999,7 +999,7 @@ summary {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  background: hsl(var(--flexoki-tx-2));
+  background: hsl(var(--palette-muted));
   border: 2px solid var(--color-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   cursor: grab;

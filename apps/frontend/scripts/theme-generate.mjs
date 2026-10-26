@@ -29,7 +29,7 @@ export const themeOrder = [
 ];
 
 // Roles every theme sets itself, in both modes, rather than inheriting Classic's.
-// Classic sets them on :root only; its .dark block changes the Flexoki values
+// Classic sets them on :root only; its .dark block changes the palette values
 // they are built from.
 export const requiredTokens = [
   "background",
@@ -163,7 +163,7 @@ export async function loadThemes(dir = definitionsDir) {
         );
       // Dark mode inherits the theme's light values, as the cascade does.
       const values = { ...theme.light, ...(mode === "dark" ? theme.dark : {}) };
-      // Classic's dark mode swaps the Flexoki values its roles are built from.
+      // Classic's dark mode swaps the palette values its roles are built from.
       const missing =
         theme === base && mode === "dark"
           ? []

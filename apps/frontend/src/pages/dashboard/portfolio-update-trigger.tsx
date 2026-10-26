@@ -83,7 +83,6 @@ export function PortfolioUpdateTrigger({
             onClick={handleUpdate} // Use internal handler
             variant="outline"
             size="sm"
-            className="rounded-full"
             disabled={updatePortfolioMutation.isPending} // Use internal mutation state
           >
             {updatePortfolioMutation.isPending ? (
@@ -99,7 +98,6 @@ export function PortfolioUpdateTrigger({
             onClick={handleRecalculate}
             variant="outline"
             size="sm"
-            className="rounded-full"
             disabled={recalculatePortfolioMutation.isPending}
           >
             {recalculatePortfolioMutation.isPending ? (

@@ -224,10 +224,7 @@ function renderHeadlineFragments(
         return <span key={i}>{f.text}</span>;
       case "amount":
         return (
-          <span
-            key={i}
-            className={cn("whitespace-nowrap font-serif font-medium", toneClass(f.tone))}
-          >
+          <span key={i} className={cn("whitespace-nowrap font-medium", toneClass(f.tone))}>
             <PrivacyAmount value={f.value} currency={currency} />
           </span>
         );
@@ -235,10 +232,7 @@ function renderHeadlineFragments(
         const d = f.descriptor.descriptor;
         const phrase = describeMoverPhrase(d, currency, isBalanceHidden, t, formatting);
         return (
-          <span
-            key={i}
-            className={cn("whitespace-nowrap font-serif font-medium", toneClass(f.tone))}
-          >
+          <span key={i} className={cn("whitespace-nowrap font-medium", toneClass(f.tone))}>
             {f.descriptor.name} {phrase}
           </span>
         );

@@ -21,9 +21,7 @@ function StatBlock({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div className="flex items-baseline gap-2.5">
       <span className="text-muted-foreground text-2xs tracking-[0.15em]">{label}</span>
-      <span className="text-foreground font-serif text-base font-semibold tabular-nums">
-        {value}
-      </span>
+      <span className="text-foreground text-sm font-medium tabular-nums">{value}</span>
     </div>
   );
 }

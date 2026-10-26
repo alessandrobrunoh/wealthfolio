@@ -192,7 +192,7 @@ export function GoalCard({ goal }: { goal: Goal }) {
           {/* Bottom-left italic quote */}
           {quote && (
             <div className="absolute bottom-2.5 end-3 start-3">
-              <span className="text-2xs line-clamp-1 block font-serif italic text-white/95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">
+              <span className="text-2xs line-clamp-1 block text-white/95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]">
                 &ldquo;{quote}&rdquo;
               </span>
             </div>
@@ -204,13 +204,13 @@ export function GoalCard({ goal }: { goal: Goal }) {
           {/* Title + % */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h3 className="truncate font-serif text-xl leading-tight">{goal.title}</h3>
+              <h3 className="truncate text-lg font-medium leading-tight">{goal.title}</h3>
               <p className="text-muted-foreground text-2xs mt-0.5 tracking-[0.15em]">
                 {targetDateStr ? `${targetDateStr} · ${timeLeftStr}` : timeLeftStr}
               </p>
             </div>
             <div className="text-end">
-              <div className={cn("font-serif text-xl leading-none", accentClass)}>
+              <div className={cn("text-lg font-medium tabular-nums leading-none", accentClass)}>
                 {progressPct}
               </div>
               <div className="text-muted-foreground text-2xs mt-0.5 tracking-[0.15em]">
@@ -222,15 +222,13 @@ export function GoalCard({ goal }: { goal: Goal }) {
           {/* Amounts row: saved · remaining */}
           <div className="mt-2.5 flex items-end justify-between gap-3">
             <div>
-              <div className="font-serif text-sm font-semibold tabular-nums">{currentDisplay}</div>
+              <div className="text-sm font-medium tabular-nums">{currentDisplay}</div>
               <div className="text-muted-foreground text-2xs mt-0.5">
                 {t("goals:card.saved_of")} <span className="tabular-nums">{targetDisplay}</span>
               </div>
             </div>
             <div className="text-end">
-              <div className="font-serif text-sm font-semibold tabular-nums">
-                {remainingDisplay}
-              </div>
+              <div className="text-sm font-medium tabular-nums">{remainingDisplay}</div>
               <div className="text-muted-foreground text-2xs mt-0.5">
                 {hasRemaining ? t("goals:card.remaining") : t("goals:card.target_met")}
               </div>

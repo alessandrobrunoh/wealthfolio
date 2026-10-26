@@ -148,13 +148,13 @@ export function PageHeader({
     <div data-tauri-drag-region={dragRegion ? "true" : undefined} className="flex min-w-0 items-center gap-3">
       {headingPrefix && (
         <>
-          <h1 className="text-muted-foreground truncate text-lg font-semibold md:text-xl">{headingPrefix}</h1>
-          <div className="bg-border h-5 w-px md:h-6" />
+          <h1 className="text-muted-foreground truncate text-base font-medium md:text-lg">{headingPrefix}</h1>
+          <div className="bg-border h-5 w-px md:h-5" />
         </>
       )}
       <div className="flex min-w-0 flex-col">
-        <h1 className="truncate text-lg font-semibold md:text-xl">{heading}</h1>
-        {text && <p className="text-muted-foreground truncate text-sm md:text-base">{text}</p>}
+        <h1 className="truncate text-base font-medium md:text-lg">{heading}</h1>
+        {text && <p className="text-muted-foreground truncate text-sm">{text}</p>}
       </div>
     </div>
   ) : null;
@@ -165,11 +165,11 @@ export function PageHeader({
       className={cn(
         "sticky top-0 z-50",
         // Native app feel with backdrop blur
-        "bg-background/80 supports-[backdrop-filter]:bg-background/60 backdrop-blur-xl",
+        "bg-background/95 supports-[backdrop-filter]:bg-background/90 backdrop-blur-sm",
         // Smooth transitions
-        "transition-all duration-300 ease-out",
+        "transition-colors duration-150 ease-out",
         // Border animation on scroll
-        showBorderOnScroll && ["border-b", isScrolled ? "border-border shadow-sm" : "border-transparent shadow-none"],
+        showBorderOnScroll && ["border-b", isScrolled ? "border-border" : "border-transparent"],
         "pt-safe md:pt-2",
         className,
       )}
@@ -179,7 +179,7 @@ export function PageHeader({
         <div data-tauri-drag-region="true" className="pointer-events-auto absolute inset-x-0 top-0 h-6 opacity-0" />
       )}
 
-      <div className="p-4">
+      <div className="px-4 py-3">
         <div className="mx-auto">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -225,7 +225,7 @@ export function PageContent({
       )}
       {...props}
     >
-      <div className="mx-auto space-y-6">{children}</div>
+      <div className="mx-auto space-y-4">{children}</div>
     </div>
   );
 }

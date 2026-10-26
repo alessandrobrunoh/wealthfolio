@@ -301,7 +301,7 @@ export default function SaveUpDetailPage({ goal, plan, overview }: Props) {
                     {t("goals:save_up.savings_plan")}
                   </span>
                 </div>
-                <h2 className="font-serif text-2xl leading-tight tracking-tight">
+                <h2 className="text-xl font-medium leading-tight tracking-tight">
                   {status.headlinePrefix}{" "}
                   <span className={status.textClass}>{status.headlineEmphasis}</span>
                   {status.headlineSuffix}

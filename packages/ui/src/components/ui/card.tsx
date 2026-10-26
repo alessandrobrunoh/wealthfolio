@@ -9,7 +9,7 @@ import { cn } from "../../lib/utils";
 const cardSurfaceClassName =
   "bg-card text-card-foreground shadow-(--card-shadow) rounded-(--card-radius) border-(color:--card-border) border";
 
-// Each part pads itself (p-6, content and footer pt-0), so call sites that
+// Each part pads itself (p-4, content and footer pt-0), so call sites that
 // adjust one part's padding keep working.
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card" className={cn(cardSurfaceClassName, "group/card", className)} {...props} />;
@@ -21,7 +21,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "group/card-header has-data-[slot=card-action]:grid has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-action]:gap-x-4 has-data-[slot=card-action]:gap-y-1.5 has-data-[slot=card-action]:space-y-0 has-data-[slot=card-description]:grid-rows-[auto_auto] flex flex-col space-y-1.5 p-6",
+        "group/card-header has-data-[slot=card-action]:grid has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-action]:gap-x-3 has-data-[slot=card-action]:gap-y-1 has-data-[slot=card-action]:space-y-0 has-data-[slot=card-description]:grid-rows-[auto_auto] flex flex-col space-y-1 p-4",
         className,
       )}
       {...props}
@@ -34,7 +34,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "text-(length:--card-title-size) tracking-(--card-title-tracking) font-semibold leading-none [text-transform:var(--card-title-case)]",
+        "text-(length:--card-title-size) tracking-(--card-title-tracking) font-medium leading-tight [text-transform:var(--card-title-case)]",
         className,
       )}
       {...props}
@@ -57,11 +57,11 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={cn("p-6 pt-0", className)} {...props} />;
+  return <div data-slot="card-content" className={cn("p-4 pt-0", className)} {...props} />;
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-footer" className={cn("flex items-center p-6 pt-0", className)} {...props} />;
+  return <div data-slot="card-footer" className={cn("flex items-center p-4 pt-0", className)} {...props} />;
 }
 
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent, cardSurfaceClassName };

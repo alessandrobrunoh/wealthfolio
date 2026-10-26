@@ -94,8 +94,8 @@ const SelectorTrigger = forwardRef<HTMLButtonElement, SelectorTriggerProps>(
           triggerVariant === "input"
             ? "bg-background/70 text-foreground hover:bg-background/70 focus-visible:border-foreground w-full justify-between rounded-lg border px-3 py-2.5 text-sm font-semibold shadow-none"
             : compact
-              ? "rounded-full"
-              : "bg-secondary/30 hover:bg-muted/80 rounded-full border-none",
+              ? "rounded-md"
+              : "bg-secondary/30 hover:bg-muted/80 rounded-md border-none",
           triggerVariant === "icon" && "h-8 w-8 justify-center p-0",
           triggerVariant === "default" &&
             (isMobile

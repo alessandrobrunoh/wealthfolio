@@ -338,7 +338,7 @@ export function SingleSelectTaxonomy({
                   type="button"
                   disabled={isDisabled}
                   className={cn(
-                    "flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-all",
+                    "flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors",
                     !isSelectedInTopCategories && selectedCategory
                       ? "border-transparent font-medium shadow-sm"
                       : "border-border bg-background hover:bg-muted/50",

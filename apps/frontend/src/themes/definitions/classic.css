@@ -1,30 +1,30 @@
 /* @name Classic */
 /* @font font-mono */
-/* Flexoki. Classic is the base theme: every other theme inherits its value for
+/* Classic is the base theme: every other theme inherits its value for
    any role it leaves out, so the roles it sets here are the whole contract. */
 :root {
   /* Base radius - desktop default */
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 
   /* Geometry the shared components read (packages/ui). Each is the value the
      component had before themes, so Classic looks the same. */
-  --button-radius: 9999px;
+  --button-radius: 0.375rem;
   /* Fields, select triggers and toggles (rounded-md). */
   --control-radius: calc(var(--radius) - 0.125rem);
   /* Field and default button height. Touch screens never go below 2.75rem
      (globals.css, --control-size). */
-  --control-height: 2.75rem;
-  --card-radius: var(--radius);
+  --control-height: 2.25rem;
+  --card-radius: 0.5rem;
   --card-border: var(--border);
-  --card-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --card-shadow: none;
   /* Select lists, menus, popovers, hover cards, the command palette; their rows
      are 0.125rem less round (rounded-xl). */
-  --popup-radius: 1rem;
+  --popup-radius: 0.625rem;
   /* Dialogs and alert dialogs on wider screens. */
-  --dialog-radius: var(--radius);
-  --badge-radius: 9999px;
+  --dialog-radius: 0.75rem;
+  --badge-radius: 0.25rem;
   /* Segmented controls (AnimatedToggleGroup) and their thumb. */
-  --segmented-radius: 9999px;
+  --segmented-radius: 0.375rem;
 
   /* Component surfaces the shared components read (packages/ui). Themes change a
      component's look here, never with rules, so a call site's own classes still
@@ -38,7 +38,7 @@
   --button-outline-bg: var(--input-bg);
   --button-outline-border: var(--input);
   --button-outline-image: none;
-  --button-outline-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --button-outline-shadow: none;
   --button-outline-hover-bg: var(--accent);
   --button-secondary-bg: var(--secondary);
   --button-secondary-border: transparent;
@@ -48,7 +48,7 @@
   /* Fields: border, the text input's resting shadow, and a glow the select
      trigger and textarea add (none in Classic). */
   --field-border: var(--input);
-  --field-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --field-shadow: none;
   --field-glow: 0 0 #0000;
   /* Switches (default size): track colours, size and thumb. */
   --switch-on: var(--primary);
@@ -57,68 +57,65 @@
   --switch-height: 1.5rem;
   --switch-thumb: var(--background);
   --switch-thumb-size: 1.25rem;
-  --switch-thumb-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --switch-thumb-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   /* The segmented control's thumb. */
   --segmented-thumb: var(--background);
   --segmented-thumb-image: none;
-  --segmented-thumb-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --segmented-thumb-shadow: none;
   /* Overlays: dialogs, alert dialogs and sheets; popups (lists, menus, popovers,
      hover cards). */
   --overlay-border: var(--border);
-  --overlay-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --overlay-shadow: 0 16px 40px rgb(0 0 0 / 0.12), 0 0 0 1px rgb(0 0 0 / 0.05);
   --sheet-bg: var(--background);
-  --popup-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --popup-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
   /* Card titles. */
-  --card-title-size: 1.25rem;
-  --card-title-tracking: -0.025em;
+  --card-title-size: 0.9375rem;
+  --card-title-tracking: -0.01em;
   --card-title-case: none;
 
-  /* Flexoki Light Theme (HSL numeric components). Classic darkens tx-2, gr
-     and ye from Flexoki so text in them reaches 4.5:1 on every surface
-     (e2e/design-system/colors.spec.ts). */
-  --flexoki-bg: 48 100% 97%;
-  --flexoki-bg-2: 51 59% 95%;
-  --flexoki-ui: 51 21% 88%;
-  --flexoki-ui-2: 50 14% 83%;
-  --flexoki-ui-3: 55 10% 79%;
-  --flexoki-tx: 0 3% 6%;
-  --flexoki-tx-2: 50 3% 36%;
-  --flexoki-tx-3: 49 7% 70%;
-  --flexoki-re: 3 62% 42%;
-  --flexoki-gr: 73 84% 26%;
-  --flexoki-ye: 45 99% 28%;
-  --flexoki-bl: 214 67% 39%;
+  /* Neutral light palette. Semantic status colors retain their established hues. */
+  --palette-background: 0 0% 100%;
+  --palette-card: 0 0% 100%;
+  --palette-border: 0 0% 90%;
+  --palette-control: 0 0% 96%;
+  --palette-divider: 0 0% 84%;
+  --palette-foreground: 0 0% 5%;
+  --palette-muted: 0 0% 40%;
+  --palette-destructive: 3 62% 42%;
+  --palette-success: 73 84% 26%;
+  --palette-warning: 45 99% 28%;
+  --palette-info: 214 67% 39%;
 
   /* Shadcn tokens as full HSL colors */
-  --background: hsl(var(--flexoki-bg));
-  --foreground: hsl(var(--flexoki-tx));
-  --card: hsl(var(--flexoki-bg-2));
-  --card-foreground: hsl(var(--flexoki-tx));
-  --popover: hsl(var(--flexoki-bg-2));
-  --popover-foreground: hsl(var(--flexoki-tx));
-  --primary: hsl(var(--flexoki-tx));
-  --primary-foreground: hsl(var(--flexoki-bg));
-  --secondary: hsl(var(--flexoki-ui-2));
-  --secondary-foreground: hsl(var(--flexoki-tx-2));
-  --muted: hsl(var(--flexoki-ui));
-  --muted-foreground: hsl(var(--flexoki-tx-2));
-  --accent: hsl(var(--flexoki-ui));
-  --accent-foreground: hsl(var(--flexoki-tx-2));
-  --destructive: hsl(var(--flexoki-re));
-  --destructive-foreground: hsl(var(--flexoki-bg));
-  --success: hsl(var(--flexoki-gr));
-  --success-foreground: hsl(var(--flexoki-bg));
-  --warning: hsl(var(--flexoki-ye));
-  --warning-foreground: hsl(var(--flexoki-bg));
-  --info: hsl(var(--flexoki-bl));
-  --info-foreground: hsl(var(--flexoki-bg));
-  --border: hsl(var(--flexoki-ui));
-  --input: hsl(var(--flexoki-ui));
+  --background: hsl(var(--palette-background));
+  --foreground: hsl(var(--palette-foreground));
+  --card: hsl(var(--palette-card));
+  --card-foreground: hsl(var(--palette-foreground));
+  --popover: hsl(var(--palette-card));
+  --popover-foreground: hsl(var(--palette-foreground));
+  --primary: hsl(var(--palette-foreground));
+  --primary-foreground: hsl(var(--palette-background));
+  --secondary: hsl(var(--palette-control));
+  --secondary-foreground: hsl(var(--palette-foreground));
+  --muted: hsl(var(--palette-control));
+  --muted-foreground: hsl(var(--palette-muted));
+  --accent: hsl(var(--palette-control));
+  --accent-foreground: hsl(var(--palette-foreground));
+  --destructive: hsl(var(--palette-destructive));
+  --destructive-foreground: hsl(var(--palette-background));
+  --success: hsl(var(--palette-success));
+  --success-foreground: hsl(var(--palette-background));
+  --warning: hsl(var(--palette-warning));
+  --warning-foreground: hsl(var(--palette-background));
+  --info: hsl(var(--palette-info));
+  --info-foreground: hsl(var(--palette-background));
+  --border: hsl(var(--palette-border));
+  --input: hsl(var(--palette-divider));
   --input-bg: var(--background);
   /* Focus indicator colour. Controls draw it as a 2px outline 2px out
      (focus-visible:outline-solid outline-2 outline-offset-2 outline-ring),
      which forced-colors mode keeps; it needs 3:1 against the page and cards. */
-  --ring: hsl(var(--flexoki-tx-2));
+  --ring: hsl(var(--palette-foreground));
 
   /* Charts (allocation palette: forest / sage / sand / clay / plum + stone) */
   --chart-1: #355c4c;
@@ -126,35 +123,28 @@
   --chart-3: #cbba8c;
   --chart-4: #c08a5f;
   --chart-5: #9a7e92;
-  --chart-6: hsl(49 7% 70%);
-  --chart-7: hsl(55 10% 79%);
-  --chart-8: hsl(50 14% 83%);
-  --chart-9: hsl(51 21% 88%);
-  --chart-stone: #b1aa9a;
+  --chart-6: hsl(0 0% 70%);
+  --chart-7: hsl(0 0% 79%);
+  --chart-8: hsl(0 0% 83%);
+  --chart-9: hsl(0 0% 88%);
+  --chart-stone: #a3a3a3;
 
   /* Sidebar (full hsl colors) */
-  --sidebar: hsl(var(--flexoki-bg));
-  --sidebar-foreground: hsl(var(--flexoki-tx));
-  --sidebar-primary: hsl(var(--flexoki-tx));
-  --sidebar-primary-foreground: hsl(var(--flexoki-bg));
-  --sidebar-accent: hsl(var(--flexoki-ui));
-  --sidebar-accent-foreground: hsl(var(--flexoki-tx-2));
-  --sidebar-border: hsl(var(--flexoki-ui));
-  --sidebar-ring: hsl(var(--flexoki-tx-2));
+  --sidebar: hsl(var(--palette-background));
+  --sidebar-foreground: hsl(var(--palette-foreground));
+  --sidebar-primary: hsl(var(--palette-foreground));
+  --sidebar-primary-foreground: hsl(var(--palette-background));
+  --sidebar-accent: hsl(var(--palette-control));
+  --sidebar-accent-foreground: hsl(var(--palette-foreground));
+  --sidebar-border: hsl(var(--palette-border));
+  --sidebar-ring: hsl(var(--palette-foreground));
 
   /* Liquid glass (the floating navigation): fill, rim, blur, depth, sheen. */
-  --liquid-glass-bg: rgba(255, 255, 255, 0.05);
-  --liquid-glass-border: rgba(255, 255, 255, 0.1);
-  --liquid-glass-blur: blur(5px);
-  --liquid-glass-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 2px rgba(255, 255, 255, 0.1);
-  --liquid-glass-sheen: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.2) 0.6%,
-    rgba(255, 255, 255, 0.05) 20.56%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  --liquid-glass-bg: rgba(255, 255, 255, 0.9);
+  --liquid-glass-border: rgba(0, 0, 0, 0.08);
+  --liquid-glass-blur: blur(8px);
+  --liquid-glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --liquid-glass-sheen: none;
   --liquid-glass-rim: none;
 
   /* Status surfaces: a pale background with text and border of the same hue,
@@ -221,7 +211,7 @@
   --heatmap-negative-low: #e9b3a8;
   --heatmap-negative-high: #d14e42;
   --heatmap-label-dark: #1c2a24;
-  --heatmap-label-light: #f5f3ec;
+  --heatmap-label-light: #ffffff;
 
   /* Spending-module shared chart tokens. --status-warn is the "approaching
      budget" amber (was #C28B47); --bar-stripe is the diagonal-stripe overlay on
@@ -237,24 +227,29 @@
 }
 
 .dark {
-  /* Flexoki Dark Theme (HSL numeric components). Classic lightens tx-2 and
-     re from Flexoki so text in them reaches 4.5:1 on every surface. */
-  --flexoki-bg: 0 3% 6%;
-  --flexoki-bg-2: 30 4% 11%;
-  --flexoki-ui: 30 3% 15%;
-  --flexoki-ui-2: 40 3% 20%;
-  --flexoki-ui-3: 30 3% 24%;
-  --flexoki-tx: 55 10% 79%;
-  --flexoki-tx-2: 43 3% 60.5%;
-  --flexoki-tx-3: 45 2% 33%;
-  --flexoki-re: 5 61% 58.5%;
-  --flexoki-gr: 72 46% 41%;
-  --flexoki-ye: 45 82% 45%;
-  --flexoki-bl: 210 47% 50%;
+  --palette-background: 0 0% 4%;
+  --palette-card: 0 0% 8%;
+  --palette-border: 0 0% 19%;
+  --palette-control: 0 0% 12%;
+  --palette-divider: 0 0% 24%;
+  --palette-foreground: 0 0% 93%;
+  --palette-muted: 0 0% 65%;
+  --palette-destructive: 5 61% 58.5%;
+  --palette-success: 72 46% 41%;
+  --palette-warning: 45 82% 45%;
+  --palette-info: 210 47% 50%;
 
-  --input: hsl(var(--flexoki-ui-2));
+  --input: hsl(var(--palette-divider));
+  --border: hsl(var(--palette-border));
+  --ring: hsl(var(--palette-muted));
   --button-outline-bg: color-mix(in oklab, var(--input) 30%, transparent);
   --button-outline-hover-bg: color-mix(in oklab, var(--input) 50%, transparent);
+  --overlay-shadow: 0 16px 40px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.08);
+  --popup-shadow: 0 4px 16px rgb(0 0 0 / 0.32);
+  --liquid-glass-bg: rgba(20, 20, 20, 0.92);
+  --liquid-glass-border: rgba(255, 255, 255, 0.1);
+  --liquid-glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --liquid-glass-sheen: none;
 
   /* Dark chart palette — same semantic hues as light (forest / sage / sand /
      clay / plum + stone), tuned for the dark surface: forest is lifted for
@@ -264,11 +259,11 @@
   --chart-3: #cbba8c;
   --chart-4: #c08a5f;
   --chart-5: #9a7e92;
-  --chart-6: hsl(49 8% 60%);
-  --chart-7: hsl(55 10% 67%);
-  --chart-8: hsl(50 13% 72%);
-  --chart-9: hsl(51 18% 77%);
-  --chart-stone: hsl(49 8% 60%);
+  --chart-6: hsl(0 0% 60%);
+  --chart-7: hsl(0 0% 67%);
+  --chart-8: hsl(0 0% 72%);
+  --chart-9: hsl(0 0% 77%);
+  --chart-stone: hsl(0 0% 60%);
 
   --success-subtle: var(--color-green-950);
   --success-subtle-foreground: var(--color-green-200);

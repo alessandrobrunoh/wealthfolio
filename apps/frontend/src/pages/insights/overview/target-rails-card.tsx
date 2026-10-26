@@ -115,7 +115,7 @@ export function TargetRailsCard({
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-1 rounded-full px-3.5 text-xs"
+            className="h-8 gap-1 rounded-md px-3.5 text-xs"
             onClick={onViewDetails}
           >
             {t("insights:insights.rails.details")}
@@ -124,7 +124,7 @@ export function TargetRailsCard({
         )}
       </div>
 
-      {/* Target selector — pill carousel */}
+      {/* Target selector */}
       {targets.length > 0 && (
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {targets.map((p) => (
@@ -133,7 +133,7 @@ export function TargetRailsCard({
               type="button"
               onClick={() => onTargetChange(p.id)}
               className={cn(
-                "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium transition-colors",
                 p.id === selectedTargetId
                   ? "bg-foreground text-background"
                   : "bg-muted text-muted-foreground hover:text-foreground",

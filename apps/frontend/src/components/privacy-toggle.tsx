@@ -19,7 +19,7 @@ export function PrivacyToggle({ className }: PrivacyToggleProps) {
       aria-label={t(
         isBalanceHidden ? "common:component.show_balance" : "common:component.hide_balance",
       )}
-      className={cn("rounded-full", className)}
+      className={cn("rounded-md", className)}
       onClick={(e) => {
         e.stopPropagation();
         toggleBalanceVisibility();

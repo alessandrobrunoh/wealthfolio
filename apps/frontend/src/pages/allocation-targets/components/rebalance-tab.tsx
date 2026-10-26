@@ -450,7 +450,7 @@ function ModeSwitch({
   ];
 
   return (
-    <div className="border-border/60 bg-card/40 grid w-full max-w-full grid-cols-3 gap-1 rounded-2xl border p-1 backdrop-blur-xl sm:inline-flex sm:w-auto sm:grid-cols-none">
+    <div className="border-border bg-muted/50 grid w-full max-w-full grid-cols-3 gap-1 rounded-lg border p-1 sm:inline-flex sm:w-auto sm:grid-cols-none">
       {modes.map((m) => {
         const disabled = !allowSells && m.id !== "cash_flow_only";
         const active = value === m.id;
@@ -461,7 +461,7 @@ function ModeSwitch({
             disabled={disabled}
             onClick={() => !disabled && onChange(m.id)}
             className={cn(
-              "group inline-flex min-w-0 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 py-3 font-mono text-xs transition-colors sm:w-auto sm:px-4",
+              "group inline-flex min-w-0 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-2 font-mono text-xs transition-colors sm:w-auto sm:px-4",
               active
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
@@ -598,7 +598,7 @@ export function PlannerInput({
             disabled={limit <= 0}
             onClick={() => onCashChange(p.value.toFixed(fraction))}
             className={cn(
-              "rounded-full border px-2.5 py-0.5 text-center font-mono text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto",
+              "rounded-md border px-2.5 py-0.5 text-center font-mono text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto",
               activePreset === p.id
                 ? "border-foreground bg-foreground text-background"
                 : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground",

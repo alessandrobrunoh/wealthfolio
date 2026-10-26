@@ -217,24 +217,24 @@ export function MobileNavBar({ navigation }: MobileNavBarProps) {
         <SheetContent
           side="bottom"
           showCloseButton={false}
-          className="bg-background inset-x-4 bottom-4 flex max-h-[min(82dvh,45rem)] flex-col gap-0 overflow-hidden rounded-[2rem] border-0 px-0 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] pt-0 shadow-2xl"
+          className="bg-background inset-x-4 bottom-4 flex max-h-[min(82dvh,45rem)] flex-col gap-0 overflow-hidden rounded-xl border-0 px-0 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] pt-0"
         >
           <div className="bg-muted mx-auto mt-4 h-1.5 w-14 shrink-0 rounded-full" />
-          <div className="flex shrink-0 items-center justify-between px-8 pb-4 pt-7">
+          <div className="flex shrink-0 items-center justify-between px-4 pb-4 pt-6">
             <div className="flex min-w-0 items-center gap-3">
               {profileView && (
                 <button
                   ref={backButtonRef}
                   type="button"
                   onClick={() => showProfileView(false)}
-                  className="hover:bg-muted flex size-11 shrink-0 items-center justify-center rounded-full"
+                  className="hover:bg-muted flex size-11 shrink-0 items-center justify-center rounded-md"
                   aria-label={t("common:back")}
                 >
                   <Icons.ArrowLeft className="size-5 rtl:rotate-180" />
                 </button>
               )}
               <SheetTitle
-                className={cn("truncate font-semibold", profileView ? "text-lg" : "text-2xl")}
+                className={cn("truncate font-medium", profileView ? "text-base" : "text-lg")}
               >
                 {profileView ? t("common:profiles.yourProfile") : t("common:layout.more")}
               </SheetTitle>
@@ -242,14 +242,14 @@ export function MobileNavBar({ navigation }: MobileNavBarProps) {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="bg-muted text-foreground hover:bg-muted/80 flex size-11 items-center justify-center rounded-full transition-colors"
+              className="bg-muted text-foreground hover:bg-muted/80 flex size-11 items-center justify-center rounded-md transition-colors"
               aria-label={t("common:layout.close_more_menu")}
             >
               <Icons.Close className="size-5" />
             </button>
           </div>
 
-          <div className="scrollbar-hide min-h-0 overflow-y-auto px-8">
+          <div className="scrollbar-hide min-h-0 overflow-y-auto px-4">
             {profileView ? (
               <MobileProfileMenu onAction={closeMenu} />
             ) : (

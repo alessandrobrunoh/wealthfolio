@@ -134,7 +134,7 @@ export function DashboardActions({ onAddAsset, onAddLiability }: DashboardAction
         <Button
           variant="secondary"
           size="icon-xs"
-          className="rounded-full"
+          className="rounded-md"
           aria-label={t("common:layout.more_options")}
         >
           <Icons.DotsThreeVertical className="size-5" weight="fill" />

@@ -639,7 +639,7 @@ export default function DashboardPage({
                   </div>
 
                   {/* Sentence-style verdict */}
-                  <h1 className="max-w-[95%] font-serif text-2xl font-normal leading-[1.15] tracking-tight">
+                  <h1 className="max-w-[95%] text-xl font-medium leading-[1.15] tracking-tight">
                     {isTraditionalMode ? (
                       traditionalStatus === "shortfall" &&
                       spendingShortfallAge != null &&
