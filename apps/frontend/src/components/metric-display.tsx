@@ -108,7 +108,7 @@ export const MetricDisplay: React.FC<MetricDisplayProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground absolute end-2 top-2 hidden h-4 w-4 rounded-full p-0 md:inline-flex"
+              className="text-muted-foreground hover:text-foreground absolute end-2 top-2 hidden h-4 w-4 rounded-md p-0 md:inline-flex"
             />
           }
         >
@@ -300,7 +300,7 @@ export const MetricLabelWithInfo: React.FC<MetricLabelWithInfoProps> = ({
               variant="ghost"
               size="icon"
               className={cn(
-                "ms-1 h-4 w-4 rounded-full p-0",
+                "ms-1 h-4 w-4 rounded-md p-0",
                 hasWarnings && "text-warning hover:text-warning",
               )}
             />

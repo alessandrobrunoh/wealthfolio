@@ -346,7 +346,7 @@ export const AccountSelector = forwardRef<HTMLButtonElement, AccountSelectorProp
               aria-label={t("common:component.select_account")}
               size={iconOnly ? "icon" : "sm"}
               className={cn(
-                "bg-secondary/30 hover:bg-muted/80 flex items-center rounded-full border-none",
+                "bg-secondary/30 hover:bg-muted/80 flex items-center rounded-md border-none",
                 iconOnly ? "h-9 w-9 p-0" : "h-10 gap-1.5 px-3 py-1 text-sm font-medium",
                 className,
               )}

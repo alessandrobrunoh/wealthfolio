@@ -39,7 +39,7 @@ export function TargetToolbarActions({
             render={
               <Button
                 variant="outline"
-                className="bg-secondary/30 hover:bg-muted/80 md:min-w-55 h-10 min-w-0 flex-1 justify-between gap-2 rounded-full border-none px-4 text-sm font-medium md:flex-none"
+                className="bg-secondary/30 hover:bg-muted/80 md:min-w-55 h-10 min-w-0 flex-1 justify-between gap-2 rounded-md border-none px-4 text-sm font-medium md:flex-none"
               />
             }
           >
@@ -64,7 +64,7 @@ export function TargetToolbarActions({
       )}
       <Button
         variant="outline"
-        className="bg-secondary/30 hover:bg-muted/80 h-10 w-10 shrink-0 rounded-full border-none p-0"
+        className="bg-secondary/30 hover:bg-muted/80 h-10 w-10 shrink-0 rounded-md border-none p-0"
         onClick={onCreateTarget}
         aria-label={t("allocation:header.newTarget")}
         title={t("allocation:header.newTarget")}
@@ -74,7 +74,7 @@ export function TargetToolbarActions({
       {target && onEditTarget && (
         <Button
           variant="outline"
-          className="bg-secondary/30 hover:bg-muted/80 h-10 w-10 shrink-0 rounded-full border-none p-0"
+          className="bg-secondary/30 hover:bg-muted/80 h-10 w-10 shrink-0 rounded-md border-none p-0"
           onClick={onEditTarget}
           aria-label={t("allocation:header.editTarget")}
           title={t("allocation:header.editTarget")}

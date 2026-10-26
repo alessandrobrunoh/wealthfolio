@@ -446,7 +446,7 @@ function buildLiveNarrative({
             ? "••••"
             : formatting.formatCompactAmount(Math.abs(diffFromPace), currency)}
         </span>{" "}
-        <span className="font-serif">{direction}</span>
+        <span>{direction}</span>
       </div>
       <div className="text-foreground/90 text-sm">
         {t("spending:whereIAm.projectedPrefix")}{" "}
@@ -1023,7 +1023,7 @@ function BreakdownCanvas({
               type="button"
               onClick={() => setFilter(chip.id)}
               className={cn(
-                "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 text-xs transition-colors",
+                "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs transition-colors",
                 active
                   ? "bg-foreground text-background"
                   : "border-border/60 text-muted-foreground hover:text-foreground border bg-transparent",
@@ -1032,7 +1032,7 @@ function BreakdownCanvas({
               <span>{chip.label}</span>
               <span
                 className={cn(
-                  "text-2xs rounded-full px-1.5 font-medium tabular-nums",
+                  "text-2xs rounded-sm px-1.5 font-medium tabular-nums",
                   active ? "bg-background/20" : "bg-muted/60",
                 )}
               >

@@ -25,7 +25,7 @@ export function FloatingNavigationBar({ navigation }: FloatingNavigationBarProps
   const [connectNavVisible] = useConnectNavVisibility();
   const { status: syncStatus } = useAggregatedSyncStatus();
   const baseButtonClass =
-    "text-foreground relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full transition-colors";
+    "text-foreground relative z-10 flex size-11 shrink-0 items-center justify-center rounded-md transition-colors";
 
   const handleNavigation = useCallback(
     (href: string, isActive: boolean) => {
@@ -78,7 +78,7 @@ export function FloatingNavigationBar({ navigation }: FloatingNavigationBarProps
                   {isActive && (
                     <motion.div
                       layoutId={`floating-nav-indicator-${uniqueId}`}
-                      className="absolute inset-0 -z-10 rounded-full border border-black/10 bg-black/5 shadow-sm dark:border-white/10 dark:bg-white/10"
+                      className="border-border bg-accent absolute inset-0 -z-10 rounded-md border"
                       initial={false}
                       transition={{
                         type: "spring",
@@ -135,7 +135,7 @@ export function FloatingNavigationBar({ navigation }: FloatingNavigationBarProps
                 {isPathActive(location.pathname, "/connect") && (
                   <motion.div
                     layoutId={`floating-nav-indicator-${uniqueId}`}
-                    className="absolute inset-0 -z-10 rounded-full border border-black/10 bg-black/5 shadow-sm dark:border-white/10 dark:bg-white/10"
+                    className="border-border bg-accent absolute inset-0 -z-10 rounded-md border"
                     initial={false}
                     transition={{
                       type: "spring",
@@ -165,7 +165,7 @@ export function FloatingNavigationBar({ navigation }: FloatingNavigationBarProps
                   {moreItems.some((item) => isPathActive(location.pathname, item.href)) && (
                     <motion.div
                       layoutId={`floating-nav-indicator-${uniqueId}`}
-                      className="absolute inset-0 -z-10 rounded-full border border-black/10 bg-black/5 shadow-sm dark:border-white/10 dark:bg-white/10"
+                      className="border-border bg-accent absolute inset-0 -z-10 rounded-md border"
                       initial={false}
                       transition={{
                         type: "spring",
@@ -198,7 +198,7 @@ export function FloatingNavigationBar({ navigation }: FloatingNavigationBarProps
                             setOverflowOpen(false);
                           }}
                           aria-current={isActive ? "page" : undefined}
-                          className="relative z-10 flex w-full items-center gap-3 rounded-full px-3 py-2 text-sm"
+                          className="relative z-10 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm"
                         >
                           <span className="flex size-6 shrink-0 items-center justify-center">
                             {renderIcon(item.icon)}

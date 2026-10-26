@@ -1328,7 +1328,7 @@ function SegmentedToggle({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="bg-card/40 border-border/60 inline-flex max-w-full items-center gap-0.5 rounded-full border p-0.5"
+      className="bg-muted/50 border-border inline-flex max-w-full items-center gap-0.5 rounded-lg border p-0.5"
     >
       {items.map((it) => {
         const active = it.value === value;
@@ -1339,9 +1339,9 @@ function SegmentedToggle({
             onClick={() => onChange(it.value)}
             aria-pressed={active}
             className={cn(
-              "text-2xs rounded-full px-2.5 py-0.5 font-medium transition-colors",
+              "text-2xs rounded-md px-2 py-0.5 font-medium transition-colors",
               active
-                ? "bg-background text-foreground shadow-xs"
+                ? "bg-background text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

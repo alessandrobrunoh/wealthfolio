@@ -170,14 +170,14 @@ export function UpdateDialog() {
       />
 
       {/* Dialog */}
-      <div className="border-border bg-card animate-in zoom-in-95 fade-in relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border shadow-2xl duration-300">
+      <div className="border-border bg-card animate-in zoom-in-95 fade-in shadow-(--overlay-shadow) relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border duration-150">
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
           {/* Header */}
           <div className="relative px-6 pb-4 pt-6">
             <button
               onClick={handleDismiss}
-              className="bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground absolute end-4 top-4 rounded-full p-2 transition-all duration-200 hover:scale-105"
+              className="bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground absolute end-4 top-4 rounded-md p-2 transition-colors duration-150"
               aria-label={t("common:component.close_dialog")}
             >
               <Icons.Close className="h-4 w-4" />
@@ -185,7 +185,7 @@ export function UpdateDialog() {
 
             {/* Version badge */}
             <div className="mb-4 flex items-center gap-3">
-              <span className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-sm font-medium">
+              <span className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 font-mono text-xs font-medium">
                 <Icons.Sparkles className="h-3.5 w-3.5" />v{updateInfo.latestVersion}
               </span>
               {releaseDate && <span className="text-muted-foreground text-sm">{releaseDate}</span>}

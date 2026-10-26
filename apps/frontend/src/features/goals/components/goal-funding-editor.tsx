@@ -470,7 +470,7 @@ export function GoalFundingEditor({
                           {isRetirement && !isDcLinked && (
                             <button
                               onClick={() => cycleTaxBucket(a.id)}
-                              className={`text-2xs shrink-0 rounded-full px-2 py-0.5 font-medium transition-colors ${
+                              className={`text-2xs shrink-0 rounded-sm px-1.5 py-0.5 font-medium transition-colors ${
                                 tb
                                   ? (TAX_BUCKET_COLORS[tb] ?? "")
                                   : "bg-muted text-muted-foreground"

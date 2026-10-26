@@ -222,7 +222,7 @@ export function ModelPresetPicker({
               type="button"
               onClick={() => onSelect(preset.id)}
               className={cn(
-                "inline-flex h-8 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition-colors",
+                "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors",
                 selected === preset.id
                   ? "border-foreground bg-foreground text-background"
                   : "bg-card hover:border-muted-foreground/50",
@@ -237,7 +237,7 @@ export function ModelPresetPicker({
             type="button"
             onClick={() => onSelect("scratch")}
             className={cn(
-              "inline-flex h-8 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition-colors",
+              "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors",
               scratchSelected
                 ? "border-foreground bg-foreground text-background"
                 : "bg-card hover:border-muted-foreground/50",

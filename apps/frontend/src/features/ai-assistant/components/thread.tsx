@@ -139,7 +139,7 @@ const ThreadSuggestions: FC = () => {
             <ThreadPrimitive.Suggestion prompt={suggestion.text} asChild>
               <Button
                 variant="ghost"
-                className="text-muted-foreground hover:text-foreground dark:hover:bg-accent/60 h-auto w-full max-w-full justify-start gap-2 whitespace-normal rounded-full border px-4 py-2.5 text-start text-sm font-normal sm:w-auto sm:justify-center sm:whitespace-nowrap sm:text-center"
+                className="text-muted-foreground hover:text-foreground dark:hover:bg-accent/60 h-auto w-full max-w-full justify-start gap-2 whitespace-normal rounded-md border px-4 py-2.5 text-start text-sm font-normal sm:w-auto sm:justify-center sm:whitespace-nowrap sm:text-center"
                 aria-label={suggestion.text}
               >
                 <Icon className="size-4 shrink-0 opacity-60" />
@@ -180,7 +180,7 @@ const Composer: FC<ComposerProps> = ({ composerActions }) => {
 
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
-      <ComposerPrimitive.AttachmentDropzone className="aui-composer-attachment-dropzone border-input bg-background has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-ring/50 data-[dragging=true]:border-ring data-[dragging=true]:bg-accent/50 dark:bg-background shadow-xs flex w-full flex-col rounded-3xl border px-1 pt-2 outline-none transition-[color,box-shadow] has-[textarea:focus-visible]:ring-[3px] data-[dragging=true]:border-dashed">
+      <ComposerPrimitive.AttachmentDropzone className="aui-composer-attachment-dropzone border-input bg-background has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-ring/50 data-[dragging=true]:border-ring data-[dragging=true]:bg-accent/50 dark:bg-background shadow-xs flex w-full flex-col rounded-lg border px-1 pt-2 outline-none transition-[color,box-shadow] has-[textarea:focus-visible]:ring-[3px] data-[dragging=true]:border-dashed">
         <ComposerAttachments />
         <ComposerPrimitive.Input
           placeholder={t("ai:thread.composerPlaceholder")}
@@ -217,7 +217,7 @@ const ComposerAction: FC<ComposerActionProps> = ({ composerActions }) => {
             type="submit"
             variant="default"
             size="icon"
-            className="aui-composer-send size-8.5 rounded-full p-1"
+            className="aui-composer-send size-8.5 rounded-md p-1"
             aria-label={t("ai:thread.sendMessage")}
           >
             <Icons.ArrowUp className="aui-composer-send-icon size-5" />
@@ -231,7 +231,7 @@ const ComposerAction: FC<ComposerActionProps> = ({ composerActions }) => {
             type="button"
             variant="default"
             size="icon"
-            className="aui-composer-cancel border-muted-foreground/60 hover:bg-primary/75 dark:border-muted-foreground/90 size-8.5 rounded-full border"
+            className="aui-composer-cancel border-muted-foreground/60 hover:bg-primary/75 dark:border-muted-foreground/90 size-8.5 rounded-md border"
             aria-label={t("ai:thread.stopGenerating")}
           >
             <Icons.Square className="aui-composer-cancel-icon size-3.5 fill-white dark:fill-black" />

@@ -141,7 +141,7 @@ export function DateRangeSelector({ value, onChange, hiddenRanges = [], asOf = n
       variant={isCustomRange ? "default" : "ghost"}
       size="sm"
       className={cn(
-        "h-8 w-9 rounded-full p-0",
+        "h-8 w-9 rounded-md p-0",
         isCustomRange && "bg-primary text-primary-foreground hover:bg-primary/90",
       )}
       aria-label={t("ui:dateRange.chooseCustom", "Choose custom date range")}

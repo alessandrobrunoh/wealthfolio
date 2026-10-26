@@ -499,7 +499,7 @@ function StripMetric({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-warning hover:text-warning h-4 w-4 shrink-0 rounded-full p-0"
+                  className="text-warning hover:text-warning h-4 w-4 shrink-0 rounded-sm p-0"
                 />
               }
             >
@@ -548,7 +548,7 @@ function StripHelpPopover({ items }: { items: StripHelpItem[] }) {
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground absolute end-0 top-0 h-6 w-6 rounded-full"
+            className="text-muted-foreground hover:text-foreground absolute end-0 top-0 h-6 w-6 rounded-md"
             aria-label={t("performance:help.aria_label")}
           />
         }
